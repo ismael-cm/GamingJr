@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "24373457080",
+    "project_id": "gamingjr-7a862",
+    "storage_bucket": "gamingjr-7a862.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24373457080:android:88ec6bb42b5236789e444d",
+        "android_client_info": {
+          "package_name": "com.example.gamingjr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtZB6G-iSui29YuvdeYnQ9ugN8x2reE2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
