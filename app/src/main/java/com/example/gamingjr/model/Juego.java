@@ -3,7 +3,6 @@ package com.example.gamingjr.model;
 import static android.content.ContentValues.TAG;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 

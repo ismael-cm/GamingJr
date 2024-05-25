@@ -5,25 +5,27 @@ import static android.content.ContentValues.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.gamingjr.adapter.JuegoAdapter;
 import com.example.gamingjr.model.Juego;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
-
     private Button btnAgregar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,10 +37,29 @@ public class HomeActivity extends AppCompatActivity {
             return insets;
         });
 
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int navHome = R.id.nav_home;
+                int navSearch = R.id.nav_search;
+                int navProfile = R.id.nav_profile;
+                int selectedItem = item.getItemId();
 
-        Log.i(TAG, "Jungla: " + R.drawable.tjungla);
-        Log.i(TAG, "Pirates: " + R.drawable.tpirates);
-        Log.i(TAG, "space: " + R.drawable.tspace);
+                if(selectedItem == navSearch) {
+                    Intent searchActivity = new Intent(HomeActivity.this, AgregarJuegoActivity.class);
+                    startActivity(searchActivity);
+                } else if (selectedItem == navProfile) {
+                    Intent juegoActivity = new Intent(HomeActivity.this, JuegoActivity.class);
+                    startActivity(juegoActivity);
+                }
+
+                Toast.makeText(HomeActivity.this, " sds " + item.getItemId() + " home " + navHome , Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+
 
         RecyclerView rvJuegos;
         rvJuegos = findViewById(R.id.recyclerJuegos);
@@ -48,10 +69,6 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onCallback(List<Juego> juegosList) {
                 // Aquí puedes trabajar con la lista de juegos después de que se ha completado la carga
-                for (Juego juego : juegosList) {
-                    Toast.makeText(HomeActivity.this, juego.getNombre(), Toast.LENGTH_SHORT).show();
-                }
-
                 JuegoAdapter adapter2 = new JuegoAdapter(juegosList);
 
                 try {
@@ -63,16 +80,9 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        //JuegoAdapter adapter2 = new JuegoAdapter(listDatos);
+        Log.i(TAG, "Jungla: " + R.drawable.tjungla);
+        Log.i(TAG, "Pirates: " + R.drawable.tpirates);
+        Log.i(TAG, "space: " + R.drawable.tspace);
 
-
-
-        btnAgregar = findViewById(R.id.btnAgregar);
-        btnAgregar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, AgregarJuegoActivity.class));
-            }
-        });
     }
 }

@@ -3,40 +3,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="8dp">
 
-    <ImageView
-        android:id="@+id/ivJuego"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_margin="8dp"
-        android:src="@drawable/tjungla"
-        app:layout_constraintStart_toStartOf="parent"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@drawable/rounded_background"
+        android:clipToOutline="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <TextView
-        android:id="@+id/tvTituloJuego"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Title"
-        android:textAppearance="?attr/textAppearanceSubtitle1"
-        app:layout_constraintStart_toEndOf="@id/ivJuego"
-        app:layout_constraintTop_toTopOf="@id/ivJuego"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivJuego"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/tjungla"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSizeMedium" />
 
-    <TextView
-        android:id="@+id/tvSubtituloJuego"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Subtitle"
-        android:textAppearance="?attr/textAppearanceBody2"
-        app:layout_constraintStart_toEndOf="@id/ivJuego"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloJuego"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="4dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000"
+            android:clipToOutline="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="bottom"
+            android:clipToOutline="true">
+
+            <TextView
+                android:id="@+id/tvTituloJuego"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="30dp"
+                android:text="Title"
+                android:textFontWeight="500"
+                android:textColor="#FFFFFF"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvSubtituloJuego"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subtitle"
+                android:textColor="#FFFFFF"
+                android:textAppearance="?attr/textAppearanceBody2" />
+        </LinearLayout>
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
