@@ -47,8 +47,8 @@ public class HomeActivity extends AppCompatActivity {
                 int selectedItem = item.getItemId();
 
                 if(selectedItem == navSearch) {
-                    Intent searchActivity = new Intent(HomeActivity.this, AgregarJuegoActivity.class);
-                    startActivity(searchActivity);
+                    Intent profileActivity = new Intent(HomeActivity.this, ProfileActivity.class);
+                    startActivity(profileActivity);
                 } else if (selectedItem == navProfile) {
                     Intent juegoActivity = new Intent(HomeActivity.this, JuegoActivity.class);
                     startActivity(juegoActivity);

@@ -12,7 +12,20 @@
           "package_name": "com.example.gamingjr"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "24373457080-sni1moc60f54k2bne1kq88kf4q6s1agl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gamingjr",
+            "certificate_hash": "0add0e85cf82c73ca14823e42a180f1face19fdf"
+          }
+        },
+        {
+          "client_id": "24373457080-v7gatifpis2qcl049dipi6i2cju04s5d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDtZB6G-iSui29YuvdeYnQ9ugN8x2reE2A"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "24373457080-v7gatifpis2qcl049dipi6i2cju04s5d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
