@@ -3,13 +3,16 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/rocket"
-        android:title="Home" />
-    <item
-        android:id="@+id/nav_search"
-        android:icon="@drawable/rocket"
-        android:title="Search" />
+        android:layout_height="48dp"
+        android:title="Inicio" />
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/rocket"
-        android:title="Profile" />
+        android:icon="@drawable/profile"
+        android:layout_height="48dp"
+        android:title="Perfil" />
+    <item
+        android:id="@+id/nav_progreso"
+        android:layout_height="48dp"
+        android:icon="@drawable/progress"
+        android:title="Progreso" />
 </menu>

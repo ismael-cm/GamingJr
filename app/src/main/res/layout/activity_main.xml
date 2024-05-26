@@ -52,7 +52,7 @@
                     android:id="@+id/editTextUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ismaelcastillo1000@gmail.com"
+                    android:text="ana.bonilla@gmail.com"
                     android:hint="Correo Electrónico" />
             </com.google.android.material.textfield.TextInputLayout>
 

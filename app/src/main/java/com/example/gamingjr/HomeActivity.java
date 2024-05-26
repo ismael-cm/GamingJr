@@ -26,6 +26,8 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
     private Button btnAgregar;
+    public BottomNavigationView bottomNavigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,29 +38,8 @@ public class HomeActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int navHome = R.id.nav_home;
-                int navSearch = R.id.nav_search;
-                int navProfile = R.id.nav_profile;
-                int selectedItem = item.getItemId();
-
-                if(selectedItem == navSearch) {
-                    Intent profileActivity = new Intent(HomeActivity.this, ProfileActivity.class);
-                    startActivity(profileActivity);
-                } else if (selectedItem == navProfile) {
-                    Intent juegoActivity = new Intent(HomeActivity.this, JuegoActivity.class);
-                    startActivity(juegoActivity);
-                }
-
-                Toast.makeText(HomeActivity.this, " sds " + item.getItemId() + " home " + navHome , Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        addMenu();
 
 
         RecyclerView rvJuegos;
@@ -84,5 +65,30 @@ public class HomeActivity extends AppCompatActivity {
         Log.i(TAG, "Pirates: " + R.drawable.tpirates);
         Log.i(TAG, "space: " + R.drawable.tspace);
 
+    }
+
+    private void addMenu() {
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int navHome = R.id.nav_home;
+                int navProgress = R.id.nav_progreso;
+                int navProfile = R.id.nav_profile;
+                int selectedItem = item.getItemId();
+
+                if (selectedItem == navProgress) {
+                    Intent progresoActivity = new Intent(HomeActivity.this, ProgresoActivity.class);
+                    startActivity(progresoActivity);
+                    return true;
+                } else if (selectedItem == navProfile) {
+                    Intent profileActivity = new Intent(HomeActivity.this, ProfileActivity.class);
+                    startActivity(profileActivity);
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 }
