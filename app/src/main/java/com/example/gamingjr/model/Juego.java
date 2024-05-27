@@ -21,9 +21,18 @@ import java.util.Map;
 
 public class Juego {
     private  String nombre;
+    private  String id;
     private String subtitulo;
     private String thumbnail;
     public List<Juego> juegosList = new ArrayList<>();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getNombre() {
         return nombre;
@@ -49,11 +58,13 @@ public class Juego {
         this.subtitulo = subtitulo;
     }
 
-    public Juego(String nombre, String subtitulo, String thumbnail) {
+    public Juego(String id, String nombre, String subtitulo, String thumbnail) {
+        this.id = id;
         this.nombre = nombre;
         this.subtitulo = subtitulo;
         this.thumbnail = thumbnail;
     }
+
 
     public Juego() {
     }
@@ -76,12 +87,11 @@ public class Juego {
                             try {
                                 Map<String, Object> data = document.getData();
 
-
                                 String nombre = data.containsKey("nombre") ? data.get("nombre").toString() : "";
                                 String subtitulo = data.containsKey("subtitulo") ? data.get("subtitulo").toString() : "";
                                 String thumbnail = data.containsKey("thumbnail") ? data.get("thumbnail").toString() : "";
 
-                                Juego j = new Juego(nombre, subtitulo, thumbnail);
+                                Juego j = new Juego(document.getId(), nombre, subtitulo, thumbnail);
                                 juegosList.add(j);
 
                             } catch (Exception e) {

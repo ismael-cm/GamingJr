@@ -18,7 +18,13 @@ import java.util.List;
 public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.ViewHolderJuego> {
 
     private List<Juego> listJuegos;
+    private OnItemClickListener listener;
     private Context context;
+
+    public JuegoAdapter(List<Juego> listJuegos, OnItemClickListener listener) {
+        this.listJuegos = listJuegos;
+        this.listener = listener;
+    }
 
     public JuegoAdapter(List<Juego> listJuegos) {
         this.listJuegos = listJuegos;
@@ -52,6 +58,16 @@ public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.ViewHolderJu
             tvTitulo = itemView.findViewById(R.id.tvTituloJuego);
             tvSubtitulo = itemView.findViewById(R.id.tvSubtituloJuego);
             ivJuego = itemView.findViewById(R.id.ivJuego);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(listJuegos.get(position));
+                    }
+                }
+            });
         }
 
         public void asignarDatos(Juego juego) {
