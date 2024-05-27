@@ -1,5 +1,6 @@
 package com.example.gamingjr.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +15,10 @@ import com.example.gamingjr.model.Juego;
 
 import java.util.List;
 
-//import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-//FirestoreRecyclerAdapter
 public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.ViewHolderJuego> {
 
-    List<Juego> listJuegos;
+    private List<Juego> listJuegos;
+    private Context context;
 
     public JuegoAdapter(List<Juego> listJuegos) {
         this.listJuegos = listJuegos;
@@ -27,7 +27,8 @@ public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.ViewHolderJu
     @NonNull
     @Override
     public ViewHolderJuego onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        context = parent.getContext();
+        View view = LayoutInflater.from(context)
                 .inflate(R.layout.juego_item, parent, false);
         return new ViewHolderJuego(view);
     }
@@ -56,7 +57,18 @@ public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.ViewHolderJu
         public void asignarDatos(Juego juego) {
             tvTitulo.setText(juego.getNombre());
             tvSubtitulo.setText(juego.getSubtitulo());
-            ivJuego.setImageResource(!juego.getThumbnail().isEmpty() ? Integer.parseInt(juego.getThumbnail()) : 0 );
+            String thumbnailName = juego.getThumbnail();
+
+            if (!thumbnailName.isEmpty()) {
+                int resourceId = context.getResources().getIdentifier(thumbnailName, "drawable", context.getPackageName());
+                if (resourceId != 0) {
+                    ivJuego.setImageResource(resourceId);
+                } else {
+                    ivJuego.setImageResource(R.drawable.default_image);
+                }
+            } else {
+                ivJuego.setImageResource(R.drawable.default_image);
+            }
         }
     }
 }
