@@ -1,24 +1,48 @@
 package com.example.gamingjr;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.Toast;
+import android.widget.VideoView;
+import android.media.MediaPlayer;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.example.gamingjr.model.Juego;
+import com.example.gamingjr.model.NivelUsuario;
 
 public class VideoIntroduccionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_video_introduccion);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        Intent intent = getIntent();
+        Juego juego = (Juego) intent.getSerializableExtra("juego");
+        NivelUsuario primerNivelUsuario = (NivelUsuario) intent.getSerializableExtra("nivel_usuario");
+        String nombreVideo = juego.getThumbnail() + "introduccion";
+
+        Toast.makeText(this, primerNivelUsuario.getEstado() + " Juego " + juego.getNombre(), Toast.LENGTH_SHORT).show();
+
+        VideoView videoView = findViewById(R.id.videoView);
+        Button buttonSkip = findViewById(R.id.buttonSkip);
+
+        // Obtener el URI del video
+        int videoResId = getResources().getIdentifier(nombreVideo, "raw", getPackageName());
+        Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + videoResId);
+
+        videoView.setVideoURI(videoUri);
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                finish();
+            }
         });
+        videoView.start();
+
+        buttonSkip.setOnClickListener(v -> finish());
     }
 }

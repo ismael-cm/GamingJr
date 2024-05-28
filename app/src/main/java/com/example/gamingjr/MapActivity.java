@@ -43,6 +43,10 @@ public class MapActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
     boolean isTitleOnLeft = true;
+    Button videoButton;
+    Juego juego;
+    NivelUsuario primerNivelUsuario;
+    int index = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,18 +60,11 @@ public class MapActivity extends AppCompatActivity {
         // Obtener el usuario actual
         final FirebaseUser user = mAuth.getCurrentUser();
 
-        if (user != null) {
-            // Si el usuario está autenticado, muestra su ID
-            Toast.makeText(this, "User id: " + user.getUid(), Toast.LENGTH_SHORT).show();
-        } else {
-            // Si el usuario no está autenticado, muestra un mensaje indicando que no hay usuario
-            Toast.makeText(this, "No user is currently signed in", Toast.LENGTH_SHORT).show();
-        }
 
         LinearLayout levelsContainer = findViewById(R.id.levelsContainer);
 
         Intent intent = getIntent();
-        Juego juego = (Juego) intent.getSerializableExtra("juego");
+        juego = (Juego) intent.getSerializableExtra("juego");
         Log.d(TAG, "Llamando a getNiveles con id_juego: " + juego.getId());
 
         // Accede a los niveles del juego seleccionado
@@ -82,40 +79,18 @@ public class MapActivity extends AppCompatActivity {
         });
 
         // Añadir botón de ver video introducción
-        Button videoButton = new Button(this);
+        videoButton = new Button(this);
         videoButton.setText("Ver Video Introducción");
-        videoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MapActivity.this, "Ver Video Introducción", Toast.LENGTH_SHORT).show();
-                // Aquí puedes iniciar una actividad de video, por ejemplo:
-                // Intent videoIntent = new Intent(MapActivity.this, VideoActivity.class);
-                // startActivity(videoIntent);
-            }
-        });
+
         levelsContainer.addView(videoButton);
 
         // Crear una vista alternada de título e imagen para cada nivel
-
+        index = 0;
         for (Nivel nivel : niveles) {
             //createNivelUsuario();
             createNivelUsuario(user.getUid(), nivel.getId(), new NivelUsuarioCallback() {
                 @Override
                 public void onCallback(NivelUsuario nivelUsuario) {
-                    if (nivelUsuario != null) {
-
-                        Log.d(TAG, "ID Usuario: " + nivelUsuario.getIdUsuario());
-                        Log.d(TAG, "ID Nivel: " + nivelUsuario.getIdNivel());
-                        Log.d(TAG, "Puntuación: " + nivelUsuario.getPuntuacion());
-                        Log.d(TAG, "Completado: " + nivelUsuario.getCompletado());
-                        Log.d(TAG, "Estado: " + nivelUsuario.getEstado());
-                    } else {
-                        // Manejar el caso de error
-                        Log.e(TAG, "No se pudieron obtener los datos del documento nivel_user");
-                    }
-
-
-
 
                     LinearLayout levelLayout = new LinearLayout(MapActivity.this);
                     levelLayout.setLayoutParams(new LinearLayout.LayoutParams(
@@ -136,12 +111,19 @@ public class MapActivity extends AppCompatActivity {
 
                     ImageView imageView = new ImageView(MapActivity.this);
 
+                    //Imagen para elementos bloqueados
                     String imageName = nivel.getVideo();
                     if (nivelUsuario.getEstado().equals("no_comenzado")){
-                        imageName = "level_lock";
+                        imageName = "level_block";
                     }
                     int imageResId = getResources().getIdentifier(imageName, "drawable", getPackageName());
                     imageView.setImageResource(imageResId);
+
+
+                    if(MapActivity.this.index == 0) {
+                        MapActivity.this.primerNivelUsuario = nivelUsuario;
+                        MapActivity.this.index++;
+                    }
 
                     imageView.setLayoutParams(new LinearLayout.LayoutParams(
                             0,
@@ -194,6 +176,23 @@ public class MapActivity extends AppCompatActivity {
     }
     interface LevelLockCallback {
         void onResult(String result);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        videoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MapActivity.this, "Ver Video Introducción", Toast.LENGTH_SHORT).show();
+
+                Intent videoIntent = new Intent(MapActivity.this, VideoIntroduccionActivity.class);
+                videoIntent.putExtra("juego", juego);
+                videoIntent.putExtra("nivel_usuario", primerNivelUsuario);
+                startActivity(videoIntent);
+            }
+        });
     }
 
     public void isLevelLock(String id_usuario, String id_nivel, LevelLockCallback callback) {

@@ -1,9 +1,10 @@
 package com.example.gamingjr.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NivelUsuario {
+public class NivelUsuario implements Serializable {
     private String id;
     private String idUsuario;
     private String idNivel;
