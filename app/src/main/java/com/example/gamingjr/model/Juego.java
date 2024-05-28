@@ -135,9 +135,10 @@ public class Juego implements Serializable {
                                                         String estado = data.containsKey("estado") ? data.get("estado").toString() : "";
                                                         String param3 = data.containsKey("param3") ? data.get("param3").toString() : "";
                                                         int puntos_minimos = Integer.parseInt(data.containsKey("puntos_minimos") ? data.get("puntos_minimos").toString() : "0");
+                                                        int orden = Integer.parseInt(data.containsKey("orden") ? data.get("orden").toString() : "0");
                                                         String video = data.containsKey("video") ? data.get("video").toString() : "";
 
-                                                        Nivel n = new Nivel(nivelDocument.getId(), activity, estado, id_juego, nombre, puntos_minimos, video, param1, param2, param3);
+                                                        Nivel n = new Nivel(nivelDocument.getId(), activity, estado, id_juego, nombre, puntos_minimos, video, param1, param2, param3, orden);
                                                         nivelesList.add(n);
 
                                                     } catch (Exception e) {

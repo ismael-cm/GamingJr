@@ -39,10 +39,6 @@ public class HomeActivity extends AppCompatActivity {
                     public void onItemClick(Juego juego) {
                         Intent intent = new Intent(HomeActivity.this, MapActivity.class);
                         intent.putExtra("juego", juego);
-
-
-
-
                         startActivity(intent);
                     }
                 });
