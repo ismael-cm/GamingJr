@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.gamingjr.adapter.JuegoAdapter;
 import com.example.gamingjr.adapter.OnItemClickListener;
 import com.example.gamingjr.model.Juego;
+import com.example.gamingjr.model.Nivel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
@@ -37,13 +38,15 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(Juego juego) {
                         Intent intent = new Intent(HomeActivity.this, MapActivity.class);
-                        intent.putExtra("id", juego.getId());
-                        intent.putExtra("nombre", juego.getNombre());
-                        intent.putExtra("subtitulo", juego.getSubtitulo());
-                        intent.putExtra("thumbnail", juego.getThumbnail());
+                        intent.putExtra("juego", juego);
+
+
+
+
                         startActivity(intent);
                     }
                 });
+
                 try {
                     rvJuegos.setAdapter(adapter2);
                 } catch (Exception e) {
@@ -52,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     private void addMenu() {

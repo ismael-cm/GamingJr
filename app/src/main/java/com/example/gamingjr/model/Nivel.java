@@ -13,14 +13,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Nivel {
+public class Nivel implements Serializable {
     private String id;
     private String activity;
     private String estado;
@@ -174,4 +176,49 @@ public class Nivel {
                 });
     }
 
+
+    public void getAll(String idJuego, final FirestoreCallback firestoreCallback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference niveles = db.collection("niveles");
+
+        Query query = niveles.whereEqualTo("id_juego", idJuego);
+
+        query.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot querySnapshot) {
+                        List<Nivel> nivelesList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : querySnapshot) {
+                            Log.d(TAG, document.getId() + " => " + document.getData());
+
+                            try {
+                                Map<String, Object> data = document.getData();
+
+                                String activity = data.containsKey("activity") ? data.get("activity").toString() : "";
+                                String id_juego = data.containsKey("id_juego") ? data.get("id_juego").toString() : "";
+                                String nombre = data.containsKey("nombre") ? data.get("nombre").toString() : "";
+                                String param1 = data.containsKey("param1") ? data.get("param1").toString() : "";
+                                String param2 = data.containsKey("param2") ? data.get("param2").toString() : "";
+                                String estado = data.containsKey("estado") ? data.get("estado").toString() : "";
+                                String param3 = data.containsKey("param3") ? data.get("param3").toString() : "";
+                                int puntos_minimos = Integer.parseInt(data.containsKey("puntos_minimos") ? data.get("puntos_minimos").toString() : "0");
+                                String video = data.containsKey("video") ? data.get("video").toString() : "";
+
+                                Nivel n = new Nivel(document.getId(), activity, estado, id_juego, nombre, puntos_minimos, video, param1, param2, param3);
+                                nivelesList.add(n);
+
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error parsing document: " + document.getId(), e);
+                            }
+                        }
+                        firestoreCallback.onCallback(nivelesList);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error al obtener documentos", e);
+                    }
+                });
+    }
 }

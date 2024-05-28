@@ -31,37 +31,19 @@ public class MapActivity extends AppCompatActivity {
 
         TextView textView2 = findViewById(R.id.textView2);
 
-        // Obtener los datos del Intent
-        String id2 = getIntent().getStringExtra("id");
-        String nombre = getIntent().getStringExtra("nombre");
-        String subtitulo = getIntent().getStringExtra("subtitulo");
-        String thumbnail = getIntent().getStringExtra("thumbnail");
 
-        textView2.setText("\nID: " + id2
-                + "\nNombre: " + nombre + "\nSubtitulo: " + subtitulo + "\n Thumbnail: " + thumbnail);
 
-        Log.d(TAG, "Llamando a getNiveles con id_juego: " + id2);
-        Nivel nivel = new Nivel();
 
-        nivel.getAll(new Nivel.FirestoreCallback() {
-            @Override
-            public void onCallback(List<Nivel> nivelesList) {
+        Intent intent = getIntent();
+        Juego juego = (Juego) intent.getSerializableExtra("juego");
+        Log.d(TAG, "Llamando a getNiveles con id_juego: " + juego.getId());
+        // Accede a los niveles del juego seleccionado
+        List<Nivel> niveles = juego.getNiveles();
+        for (Nivel nivel : niveles) {
+            Toast.makeText(MapActivity.this, nivel.getNombre(), Toast.LENGTH_SHORT).show();
+        }
 
-                try {
-                    for (Nivel n : nivelesList) {
-                        try {
-                            Log.i(TAG, "Nivel " + n.getNombre());
-
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error al convertir el documento a Nivel: ", e);
-                        }
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(MapActivity.this, e.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        textView2.setText("\nID: " + juego.getId());
     }
 
 }
