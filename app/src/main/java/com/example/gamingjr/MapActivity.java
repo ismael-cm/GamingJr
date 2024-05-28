@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gamingjr.model.NivelUsuario;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -41,6 +42,7 @@ public class MapActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
+    boolean isTitleOnLeft = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,75 +96,100 @@ public class MapActivity extends AppCompatActivity {
         levelsContainer.addView(videoButton);
 
         // Crear una vista alternada de título e imagen para cada nivel
-        boolean isTitleOnLeft = true;
+
         for (Nivel nivel : niveles) {
-            createNivelUsuario(user.getUid(), nivel.getId());
-            LinearLayout levelLayout = new LinearLayout(this);
-            levelLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    300  // Altura fija para hacer las imágenes más grandes
-            ));
-            levelLayout.setOrientation(LinearLayout.HORIZONTAL);
-            levelLayout.setGravity(Gravity.CENTER);  // Centrar los elementos dentro del contenedor
-
-            TextView titleView = new TextView(this);
-            titleView.setText(nivel.getNombre());
-            titleView.setLayoutParams(new LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    1
-            ));
-            titleView.setGravity(Gravity.CENTER);
-
-            ImageView imageView = new ImageView(this);
-
-
-            int imageResId = getResources().getIdentifier(nivel.getVideo(), "drawable", getPackageName());
-            imageView.setImageResource(imageResId);
-
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    1
-            ));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-            if (isTitleOnLeft) {
-                levelLayout.addView(titleView);
-                levelLayout.addView(imageView);
-            } else {
-                levelLayout.addView(imageView);
-                levelLayout.addView(titleView);
-            }
-
-            // Alterna la disposición para el siguiente nivel
-            isTitleOnLeft = !isTitleOnLeft;
-
-            // Añade el nivelLayout al levelsContainer
-            levelsContainer.addView(levelLayout);
-
-            // Añadir lógica de clic al título
-            titleView.setOnClickListener(new View.OnClickListener() {
+            //createNivelUsuario();
+            createNivelUsuario(user.getUid(), nivel.getId(), new NivelUsuarioCallback() {
                 @Override
-                public void onClick(View v) {
-                    Toast.makeText(MapActivity.this, "Iniciando " + nivel.getNombre(), Toast.LENGTH_SHORT).show();
-                    // Aquí puedes iniciar la actividad correspondiente al nivel, por ejemplo:
-                    // Intent nivelIntent = new Intent(MapActivity.this, NivelActivity.class);
-                    // nivelIntent.putExtra("nivel", nivel);
-                    // startActivity(nivelIntent);
+                public void onCallback(NivelUsuario nivelUsuario) {
+                    if (nivelUsuario != null) {
+
+                        Log.d(TAG, "ID Usuario: " + nivelUsuario.getIdUsuario());
+                        Log.d(TAG, "ID Nivel: " + nivelUsuario.getIdNivel());
+                        Log.d(TAG, "Puntuación: " + nivelUsuario.getPuntuacion());
+                        Log.d(TAG, "Completado: " + nivelUsuario.getCompletado());
+                        Log.d(TAG, "Estado: " + nivelUsuario.getEstado());
+                    } else {
+                        // Manejar el caso de error
+                        Log.e(TAG, "No se pudieron obtener los datos del documento nivel_user");
+                    }
+
+
+
+
+                    LinearLayout levelLayout = new LinearLayout(MapActivity.this);
+                    levelLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            300  // Altura fija para hacer las imágenes más grandes
+                    ));
+                    levelLayout.setOrientation(LinearLayout.HORIZONTAL);
+                    levelLayout.setGravity(Gravity.CENTER);  // Centrar los elementos dentro del contenedor
+
+                    TextView titleView = new TextView(MapActivity.this);
+                    titleView.setText(nivel.getNombre());
+                    titleView.setLayoutParams(new LinearLayout.LayoutParams(
+                            0,
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            1
+                    ));
+                    titleView.setGravity(Gravity.CENTER);
+
+                    ImageView imageView = new ImageView(MapActivity.this);
+
+                    String imageName = nivel.getVideo();
+                    if (nivelUsuario.getEstado().equals("no_comenzado")){
+                        imageName = "level_lock";
+                    }
+                    int imageResId = getResources().getIdentifier(imageName, "drawable", getPackageName());
+                    imageView.setImageResource(imageResId);
+
+                    imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                            0,
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            1
+                    ));
+                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+                    if (MapActivity.this.isTitleOnLeft) {
+                        levelLayout.addView(titleView);
+                        levelLayout.addView(imageView);
+                    } else {
+                        levelLayout.addView(imageView);
+                        levelLayout.addView(titleView);
+                    }
+
+                    // Alterna la disposición para el siguiente nivel
+                    isTitleOnLeft = !isTitleOnLeft;
+
+                    // Añade el nivelLayout al levelsContainer
+                    levelsContainer.addView(levelLayout);
+
+                    // Añadir lógica de clic al título
+                    titleView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(MapActivity.this, "Iniciando " + nivel.getNombre(), Toast.LENGTH_SHORT).show();
+                            // Aquí puedes iniciar la actividad correspondiente al nivel, por ejemplo:
+                            // Intent nivelIntent = new Intent(MapActivity.this, NivelActivity.class);
+                            // nivelIntent.putExtra("nivel", nivel);
+                            // startActivity(nivelIntent);
+                        }
+                    });
+
+                    imageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(MapActivity.this, "Iniciando " + nivel.getNombre(), Toast.LENGTH_SHORT).show();
+                            // Aquí puedes iniciar la actividad correspondiente al nivel, por ejemplo:
+                            // Intent nivelIntent = new Intent(MapActivity.this, NivelActivity.class);
+                            // nivelIntent.putExtra("nivel", nivel);
+                            // startActivity(nivelIntent);
+                        }
+                    });
                 }
             });
 
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(MapActivity.this, "Iniciando " + nivel.getNombre(), Toast.LENGTH_SHORT).show();
-                    // Aquí puedes iniciar la actividad correspondiente al nivel, por ejemplo:
-                    // Intent nivelIntent = new Intent(MapActivity.this, NivelActivity.class);
-                    // nivelIntent.putExtra("nivel", nivel);
-                    // startActivity(nivelIntent);
-                }
-            });
+
         }
     }
     interface LevelLockCallback {
@@ -191,52 +218,56 @@ public class MapActivity extends AppCompatActivity {
                 });
     }
 
+    public interface NivelUsuarioCallback {
+        void onCallback(NivelUsuario nivelUsuario);
+    }
 
 
-    protected void createNivelUsuario(String id_usuario, String id_nivel) {
+    protected void createNivelUsuario(String id_usuario, String id_nivel, final NivelUsuarioCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Crear una referencia a la colección nivel_user y al documento del usuario actual
         CollectionReference nivelUserCollection = db.collection("nivel_user");
-        DocumentReference userDocument = nivelUserCollection.document(id_usuario + "_" + id_nivel); // Usamos una combinación de userId y nivelId como identificador del documento
+        DocumentReference userDocument = nivelUserCollection.document(id_usuario + "_" + id_nivel);
 
-        // Verificar si el documento ya existe
         userDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        // El documento ya existe, no es necesario crear uno nuevo
                         Log.d(TAG, "El documento nivel_user ya existe para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel);
+                        Map<String, Object> data = document.getData();
+                        if (data != null) {
+                            NivelUsuario nivelUsuario = NivelUsuario.fromMap(data);
+                            callback.onCallback(nivelUsuario);
+                        } else {
+                            callback.onCallback(null);
+                        }
                     } else {
-                        // El documento no existe, crear uno nuevo
-                        // Crear un objeto Map con los datos a guardar en el documento
-                        Map<String, Object> userData = new HashMap<>();
-                        userData.put("id_usuario", id_usuario);
-                        userData.put("id_nivel", id_nivel);
-                        userData.put("puntuacion", "0");
-                        userData.put("completado", "false");
-                        userData.put("estado", "no_comenzado");
+                        NivelUsuario nuevoNivelUsuario = new NivelUsuario(
+                                id_usuario + "_" + id_nivel, id_usuario, id_nivel, "0", "false", "no_comenzado");
 
-                        // Añadir los datos al nuevo documento
-                        userDocument.set(userData)
+                        userDocument.set(nuevoNivelUsuario.toMap())
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         Log.d(TAG, "Documento nivel_user creado exitosamente para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel);
+                                        callback.onCallback(nuevoNivelUsuario);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Log.e(TAG, "Error al crear el documento nivel_user para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel, e);
+                                        callback.onCallback(null); // Manejar error adecuadamente
                                     }
                                 });
                     }
                 } else {
                     Log.e(TAG, "Error al verificar la existencia del documento nivel_user para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel, task.getException());
+                    callback.onCallback(null); // Manejar error adecuadamente
                 }
             }
         });
     }
+
 }
