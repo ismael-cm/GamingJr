@@ -3,6 +3,7 @@ package com.example.gamingjr;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -37,7 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
+import com.google.android.material.snackbar.Snackbar;
+import android.view.View;
 public class MapActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -46,29 +48,29 @@ public class MapActivity extends AppCompatActivity {
     Button videoButton;
     Juego juego;
     NivelUsuario primerNivelUsuario;
+    LinearLayout levelsContainer;
+    List<Nivel> niveles;
     int index = 0;
+    FirebaseUser user;
+    View rootView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
         db = FirebaseFirestore.getInstance();
-
         // Inicializar FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
-
         // Obtener el usuario actual
-        final FirebaseUser user = mAuth.getCurrentUser();
-
-
-        LinearLayout levelsContainer = findViewById(R.id.levelsContainer);
-
+        user = mAuth.getCurrentUser();
+        levelsContainer = findViewById(R.id.levelsContainer);
         Intent intent = getIntent();
         juego = (Juego) intent.getSerializableExtra("juego");
         Log.d(TAG, "Llamando a getNiveles con id_juego: " + juego.getId());
+        rootView = findViewById(android.R.id.content);
 
         // Accede a los niveles del juego seleccionado
-        List<Nivel> niveles = juego.getNiveles();
+        niveles = juego.getNiveles();
 
         // Ordena la lista de niveles por el campo 'orden'
         Collections.sort(niveles, new Comparator<Nivel>() {
@@ -81,9 +83,12 @@ public class MapActivity extends AppCompatActivity {
         // Añadir botón de ver video introducción
         videoButton = new Button(this);
         videoButton.setText("Ver Video Introducción");
-
         levelsContainer.addView(videoButton);
+    }
 
+    private void crearNiveles() {
+        levelsContainer.removeAllViews();
+        levelsContainer.addView(videoButton);
         // Crear una vista alternada de título e imagen para cada nivel
         index = 0;
         for (Nivel nivel : niveles) {
@@ -113,7 +118,8 @@ public class MapActivity extends AppCompatActivity {
 
                     //Imagen para elementos bloqueados
                     String imageName = nivel.getVideo();
-                    if (nivelUsuario.getEstado().equals("no_comenzado")){
+                    boolean isLevelBlocked = nivelUsuario.getEstado().equals("no_comenzado");
+                    if (isLevelBlocked){
                         imageName = "level_block";
                     }
                     int imageResId = getResources().getIdentifier(imageName, "drawable", getPackageName());
@@ -150,22 +156,14 @@ public class MapActivity extends AppCompatActivity {
                     titleView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Toast.makeText(MapActivity.this, "Iniciando " + nivel.getNombre(), Toast.LENGTH_SHORT).show();
-                            // Aquí puedes iniciar la actividad correspondiente al nivel, por ejemplo:
-                            // Intent nivelIntent = new Intent(MapActivity.this, NivelActivity.class);
-                            // nivelIntent.putExtra("nivel", nivel);
-                            // startActivity(nivelIntent);
+                            handleLevelClick(isLevelBlocked, nivel, nivelUsuario);
                         }
                     });
 
                     imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Toast.makeText(MapActivity.this, "Iniciando " + nivel.getNombre(), Toast.LENGTH_SHORT).show();
-                            // Aquí puedes iniciar la actividad correspondiente al nivel, por ejemplo:
-                            // Intent nivelIntent = new Intent(MapActivity.this, NivelActivity.class);
-                            // nivelIntent.putExtra("nivel", nivel);
-                            // startActivity(nivelIntent);
+                            handleLevelClick(isLevelBlocked, nivel, nivelUsuario);
                         }
                     });
                 }
@@ -174,6 +172,42 @@ public class MapActivity extends AppCompatActivity {
 
         }
     }
+
+    private void handleLevelClick(boolean isLevelBlocked, Nivel nivel, NivelUsuario nivelUsuario) {
+        if(!isLevelBlocked) {
+            //Iniciar juego.
+            String className = "com.example.gamingjr.niveles." +  nivel.getActivity(); // Nombre de la clase como String
+            Class<?> activityClass = null; // Convertir el nombre de la clase a Class
+            try {
+                activityClass = Class.forName(className);
+
+                // Crear el Intent con la clase obtenida
+                Intent nivelIntent = new Intent(MapActivity.this, activityClass);
+                nivelIntent.putExtra("param1", nivel.getParam1());
+                nivelIntent.putExtra("param2", nivel.getParam2());
+                nivelIntent.putExtra("param3", nivel.getParam3());
+                nivelIntent.putExtra("nivelUsuario", nivelUsuario);
+                nivelIntent.putExtra("nivel", nivel);
+                startActivity(nivelIntent);
+            } catch (ClassNotFoundException e) {
+                showDangerSnakBar("Ocurrió un error " + e.getMessage());
+            }
+
+        } else {
+            showDangerSnakBar("El " + nivel.getNombre() +" está bloqueado, completa los niveles anteriores ");
+        }
+    }
+
+    private void showDangerSnakBar(String s) {
+
+        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
+        snackbar.setBackgroundTint(Color.RED);
+        View snackbarView = snackbar.getView();
+        TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setTextSize(20);
+        snackbar.show();
+    }
+
     interface LevelLockCallback {
         void onResult(String result);
     }
@@ -185,14 +219,26 @@ public class MapActivity extends AppCompatActivity {
         videoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MapActivity.this, "Ver Video Introducción", Toast.LENGTH_SHORT).show();
-
-                Intent videoIntent = new Intent(MapActivity.this, VideoIntroduccionActivity.class);
-                videoIntent.putExtra("juego", juego);
-                videoIntent.putExtra("nivel_usuario", primerNivelUsuario);
-                startActivity(videoIntent);
+                playIntro();
             }
         });
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        crearNiveles();
+    }
+
+    private void playIntro() {
+        Toast.makeText(MapActivity.this, "Ver Video Introducción", Toast.LENGTH_SHORT).show();
+
+        Intent videoIntent = new Intent(MapActivity.this, VideoIntroduccionActivity.class);
+        videoIntent.putExtra("juego", juego);
+        videoIntent.putExtra("nivel_usuario", primerNivelUsuario);
+        startActivity(videoIntent);
     }
 
     public void isLevelLock(String id_usuario, String id_nivel, LevelLockCallback callback) {
