@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
+import android.widget.VideoView;
+
 public class MapActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;

@@ -2,11 +2,14 @@ package com.example.gamingjr.niveles;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,9 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Nivel1Activity extends AppCompatActivity {
 
-    String param1;
-    String param2;
-    String param3;
+    String param1,param2,param3;
     FirebaseUser user;
     View rootView;
     private FirebaseAuth mAuth;
@@ -36,6 +37,9 @@ public class Nivel1Activity extends AppCompatActivity {
     NivelUsuario nivelUsuario;
     TextView tvNombreNivel;
     Nivel nivel;
+
+    private VideoView videoView;
+    private Button btnSkipVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +57,24 @@ public class Nivel1Activity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        videoView = findViewById(R.id.videoView);
+        btnSkipVideo = findViewById(R.id.btnSkipVideo);
 
         tvNombreNivel = findViewById(R.id.tvNombreNivel);
 
         getInitialData();
         setupButtons();
+        setupVideoView();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Toast.makeText(this, "Holamundo", Toast.LENGTH_SHORT).show();
+
         showSnakBar("Iniciando bien con puntuacion " + nivelUsuario.getPuntuacion());
+
+        //Reproducir video de introduccion.
+        setPlayVideo("intro");
     }
 
     private void showSnakBar(String s) {
@@ -74,6 +84,47 @@ public class Nivel1Activity extends AppCompatActivity {
         TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(20);
         snackbar.show();
+    }
+
+    private void setupVideoView() {
+        String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.nivel1final;
+        Uri uri = Uri.parse(videoPath);
+        videoView.setVideoURI(uri);
+
+        videoView.setOnCompletionListener(mp -> hideVideoView());
+        btnSkipVideo.setOnClickListener(v -> hideVideoView());
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                hideVideoView();
+            }
+        });
+    }
+
+    private void setPlayVideo(String compleme) {
+        try {
+            String nombreVideo = nivel.getVideo() + compleme;
+
+            // Obtener el URI del video
+            int videoResId = getResources().getIdentifier(nombreVideo, "raw", getPackageName());
+            Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + videoResId);
+            videoView.setVideoURI(videoUri);
+            showVideoView();
+        } catch (Exception e) {
+            showSnakBar("Ocurrio un error en el video " + e.getMessage());
+        }
+    }
+
+    private void showVideoView() {
+        videoView.setVisibility(View.VISIBLE);
+        btnSkipVideo.setVisibility(View.VISIBLE);
+        videoView.start();
+    }
+
+    private void hideVideoView() {
+        videoView.stopPlayback();
+        videoView.setVisibility(View.GONE);
+        btnSkipVideo.setVisibility(View.GONE);
     }
 
     private void getInitialData() {
@@ -99,7 +150,7 @@ public class Nivel1Activity extends AppCompatActivity {
         Button btnAgregarPuntos = findViewById(R.id.btnAgregarPuntos);
 
         btnActualizarEstado.setOnClickListener(v -> {
-            String nuevoEstado = "en_progreso";  // Ejemplo de nuevo estado
+            String nuevoEstado = "completado";  // Ejemplo de nuevo estado
             actualizarEstadoEnFirestore(nuevoEstado);
             nivelUsuario.setEstado(nuevoEstado);
         });
@@ -107,6 +158,11 @@ public class Nivel1Activity extends AppCompatActivity {
         btnAgregarPuntos.setOnClickListener(v -> {
             int puntosActuales = Integer.parseInt(nivelUsuario.getPuntuacion());
             int nuevosPuntos = puntosActuales + 5;
+
+            if(nuevosPuntos >= nivel.getPuntos_minimos()) {
+                setPlayVideo("final");
+            }
+
             actualizarPuntuacionEnFirestore(String.valueOf(nuevosPuntos));
             nivelUsuario.setPuntuacion(String.valueOf(nuevosPuntos));
         });
