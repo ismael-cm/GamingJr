@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -20,12 +22,20 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.gamingjr.R;
 import com.example.gamingjr.model.Nivel;
 import com.example.gamingjr.model.NivelUsuario;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class Nivel1Activity extends AppCompatActivity {
 
@@ -77,6 +87,15 @@ public class Nivel1Activity extends AppCompatActivity {
         setPlayVideo("intro");
     }
 
+    private void showSnakBar(String s, int color) {
+        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
+        snackbar.setBackgroundTint(color);
+        View snackbarView = snackbar.getView();
+        TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setTextSize(20);
+        snackbar.show();
+    }
+
     private void showSnakBar(String s) {
         Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
         snackbar.setBackgroundTint(Color.GREEN);
@@ -86,25 +105,6 @@ public class Nivel1Activity extends AppCompatActivity {
         snackbar.show();
     }
 
-    private void showSnakBarNextLevel(String s) {
-        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_INDEFINITE);
-
-        // Configurar el botón "Siguiente nivel"
-        snackbar.setAction("Siguiente nivel", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Aquí puedes manejar la acción del botón, como pasar al siguiente nivel
-                nextLevel();
-            }
-        });
-
-        // Personalizar el texto del Snackbar
-        View snackbarView = snackbar.getView();
-        TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setTextSize(20);
-
-        snackbar.show();
-    }
 
 
 
@@ -120,7 +120,7 @@ public class Nivel1Activity extends AppCompatActivity {
             public void onCompletion(MediaPlayer mp) {
                 hideVideoView();
                 if(isFinished) {
-                    showSnakBarNextLevel("Nivel finalizado");
+                    nextLevel();
                 }
             }
         });
@@ -149,7 +149,7 @@ public class Nivel1Activity extends AppCompatActivity {
     }
 
     private void hideVideoView() {
-        showSnakBarNextLevel("Nivel finalizado");
+        if (isFinished) nextLevel();
         videoView.stopPlayback();
         videoView.setVisibility(View.GONE);
         btnSkipVideo.setVisibility(View.GONE);
@@ -208,13 +208,48 @@ public class Nivel1Activity extends AppCompatActivity {
                 .addOnFailureListener(e -> showSnakBar("Error al actualizar estado: " + e.getMessage()));
     }
 
-
-
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     // Método para manejar la acción de "Siguiente nivel"
     private void nextLevel() {
-        //
+        try {
+            CollectionReference ref = db.collection("nivel_user");
+
+            Query query = ref
+                    .whereEqualTo("id_usuario", user.getUid())
+                    .whereEqualTo("orden", (nivelUsuario.getOrden() + 1));
+
+            Log.i("Test", nivel.getId());
+            Log.i("Test", user.getUid());
+            Log.i("Test", (nivel.getOrden()) + "");
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+
+                            DocumentReference docRef = db.collection("nivel_user").document(document.getId());
+                            docRef.update("estado", "Activo")
+                                    .addOnSuccessListener(aVoid -> showSnakBar("Juego Completado"))
+                                    .addOnFailureListener(e -> showSnakBar("Error al actualizar estado: " + e.getMessage()));
+
+                        }
+                    } else {
+                        showSnakBar("No hay datos");
+                    }
+                }
+            });
+
+
+            finish();
+
+        } catch (Exception e) {
+            showSnakBar("ERROR: " + e.getMessage());
+            Log.e("Test ", e.getMessage());
+        }
+
     }
 }

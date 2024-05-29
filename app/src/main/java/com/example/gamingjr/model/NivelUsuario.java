@@ -11,14 +11,24 @@ public class NivelUsuario implements Serializable {
     private String puntuacion;
     private String completado;
     private String estado;
+    private Long orden;
 
-    public NivelUsuario(String id, String idUsuario, String idNivel, String puntuacion, String completado, String estado) {
+    public NivelUsuario(String id, String idUsuario, String idNivel, String puntuacion, String completado, String estado, Long orden) {
         this.idUsuario = idUsuario;
         this.idNivel = idNivel;
         this.puntuacion = puntuacion;
         this.completado = completado;
         this.estado = estado;
         this.id = id;
+        this.orden = orden;
+    }
+
+    public Long getOrden() {
+        return orden;
+    }
+
+    public void setOrden(Long orden) {
+        this.orden = orden;
     }
 
     public String getId() {
@@ -55,6 +65,7 @@ public class NivelUsuario implements Serializable {
         map.put("puntuacion", puntuacion);
         map.put("completado", completado);
         map.put("estado", estado);
+        map.put("orden", orden);
         return map;
     }
 
@@ -66,7 +77,9 @@ public class NivelUsuario implements Serializable {
         String puntuacion = (String) map.get("puntuacion");
         String completado = (String) map.get("completado");
         String estado = (String) map.get("estado");
+        Long orden = (Long) map.get("orden");
 
-        return new NivelUsuario(id, idUsuario, idNivel, puntuacion, completado, estado);
+
+        return new NivelUsuario(id, idUsuario, idNivel, puntuacion, completado, estado, orden);
     }
 }

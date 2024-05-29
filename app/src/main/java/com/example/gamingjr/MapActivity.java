@@ -53,6 +53,7 @@ public class MapActivity extends AppCompatActivity {
     LinearLayout levelsContainer;
     List<Nivel> niveles;
     int index = 0;
+    Long count = 0L;
     FirebaseUser user;
     View rootView;
     @Override
@@ -89,89 +90,93 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void crearNiveles() {
-        levelsContainer.removeAllViews();
-        levelsContainer.addView(videoButton);
-        // Crear una vista alternada de título e imagen para cada nivel
-        index = 0;
-        for (Nivel nivel : niveles) {
-            //createNivelUsuario();
-            createNivelUsuario(user.getUid(), nivel.getId(), new NivelUsuarioCallback() {
-                @Override
-                public void onCallback(NivelUsuario nivelUsuario) {
+        try {
+            levelsContainer.removeAllViews();
+            levelsContainer.addView(videoButton);
+            // Crear una vista alternada de título e imagen para cada nivel
+            index = 0;
+            count = 0L;
+            for (Nivel nivel : niveles) {
+                //createNivelUsuario();
+                createNivelUsuario(user.getUid(), nivel.getId(), count + 1, new NivelUsuarioCallback() {
+                    @Override
+                    public void onCallback(NivelUsuario nivelUsuario) {
+                        LinearLayout levelLayout = new LinearLayout(MapActivity.this);
+                        levelLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                300  // Altura fija para hacer las imágenes más grandes
+                        ));
+                        levelLayout.setOrientation(LinearLayout.HORIZONTAL);
+                        levelLayout.setGravity(Gravity.CENTER);  // Centrar los elementos dentro del contenedor
 
-                    LinearLayout levelLayout = new LinearLayout(MapActivity.this);
-                    levelLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            300  // Altura fija para hacer las imágenes más grandes
-                    ));
-                    levelLayout.setOrientation(LinearLayout.HORIZONTAL);
-                    levelLayout.setGravity(Gravity.CENTER);  // Centrar los elementos dentro del contenedor
+                        TextView titleView = new TextView(MapActivity.this);
+                        titleView.setText(nivel.getNombre());
+                        titleView.setLayoutParams(new LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                1
+                        ));
+                        titleView.setGravity(Gravity.CENTER);
 
-                    TextView titleView = new TextView(MapActivity.this);
-                    titleView.setText(nivel.getNombre());
-                    titleView.setLayoutParams(new LinearLayout.LayoutParams(
-                            0,
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            1
-                    ));
-                    titleView.setGravity(Gravity.CENTER);
+                        ImageView imageView = new ImageView(MapActivity.this);
 
-                    ImageView imageView = new ImageView(MapActivity.this);
-
-                    //Imagen para elementos bloqueados
-                    String imageName = nivel.getVideo();
-                    boolean isLevelBlocked = nivelUsuario.getEstado().equals("no_comenzado");
-                    if (isLevelBlocked){
-                        imageName = "level_block";
-                    }
-                    int imageResId = getResources().getIdentifier(imageName, "drawable", getPackageName());
-                    imageView.setImageResource(imageResId);
-
-
-                    if(MapActivity.this.index == 0) {
-                        MapActivity.this.primerNivelUsuario = nivelUsuario;
-                        MapActivity.this.index++;
-                    }
-
-                    imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                            0,
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            1
-                    ));
-                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                    if (MapActivity.this.isTitleOnLeft) {
-                        levelLayout.addView(titleView);
-                        levelLayout.addView(imageView);
-                    } else {
-                        levelLayout.addView(imageView);
-                        levelLayout.addView(titleView);
-                    }
-
-                    // Alterna la disposición para el siguiente nivel
-                    isTitleOnLeft = !isTitleOnLeft;
-
-                    // Añade el nivelLayout al levelsContainer
-                    levelsContainer.addView(levelLayout);
-
-                    // Añadir lógica de clic al título
-                    titleView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            handleLevelClick(isLevelBlocked, nivel, nivelUsuario);
+                        //Imagen para elementos bloqueados
+                        String imageName = nivel.getVideo();
+                        boolean isLevelBlocked = nivelUsuario.getEstado().equals("no_comenzado");
+                        if (isLevelBlocked){
+                            imageName = "level_block";
                         }
-                    });
+                        int imageResId = getResources().getIdentifier(imageName, "drawable", getPackageName());
+                        imageView.setImageResource(imageResId);
 
-                    imageView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            handleLevelClick(isLevelBlocked, nivel, nivelUsuario);
+
+                        if(MapActivity.this.index == 0) {
+                            MapActivity.this.primerNivelUsuario = nivelUsuario;
+                            MapActivity.this.index++;
                         }
-                    });
-                }
-            });
 
+                        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                1
+                        ));
+                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
+                        if (MapActivity.this.isTitleOnLeft) {
+                            levelLayout.addView(titleView);
+                            levelLayout.addView(imageView);
+                        } else {
+                            levelLayout.addView(imageView);
+                            levelLayout.addView(titleView);
+                        }
+
+                        // Alterna la disposición para el siguiente nivel
+                        isTitleOnLeft = !isTitleOnLeft;
+
+                        // Añade el nivelLayout al levelsContainer
+                        levelsContainer.addView(levelLayout);
+
+                        // Añadir lógica de clic al título
+                        titleView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                handleLevelClick(isLevelBlocked, nivel, nivelUsuario);
+                            }
+                        });
+
+                        imageView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                handleLevelClick(isLevelBlocked, nivel, nivelUsuario);
+                            }
+                        });
+                    }
+                });
+
+                count ++;
+            }
+        } catch (Exception e) {
+            showDangerSnakBar(e.getMessage());
         }
     }
 
@@ -202,16 +207,16 @@ public class MapActivity extends AppCompatActivity {
 
     private void showDangerSnakBar(String s) {
 
-        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
-        snackbar.setBackgroundTint(Color.RED);
-        View snackbarView = snackbar.getView();
-        TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setTextSize(20);
-        snackbar.show();
-    }
-
-    interface LevelLockCallback {
-        void onResult(String result);
+       try {
+           Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
+           snackbar.setBackgroundTint(Color.RED);
+           View snackbarView = snackbar.getView();
+           TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+           textView.setTextSize(20);
+           snackbar.show();
+       } catch (Exception e){
+           Toast.makeText(this, "error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+       }
     }
 
     @Override
@@ -224,8 +229,6 @@ public class MapActivity extends AppCompatActivity {
                 playIntro();
             }
         });
-
-
     }
 
     @Override
@@ -243,78 +246,65 @@ public class MapActivity extends AppCompatActivity {
         startActivity(videoIntent);
     }
 
-    public void isLevelLock(String id_usuario, String id_nivel, LevelLockCallback callback) {
-        AtomicReference<String> result = new AtomicReference<>("lock");
-        db.collection("nivel_user")
-                .whereEqualTo("id_nivel", id_nivel)
-                .whereEqualTo("id_usuario", id_usuario)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            String estado = documentSnapshot.getString("estado");
-
-                            if (estado.equals("no_comenzado")) {
-                                result.set("lock");
-                            } else {
-                                result.set("unlock");
-                            }
-                        }
-                    }
-                    callback.onResult(result.get());
-                });
-    }
-
     public interface NivelUsuarioCallback {
         void onCallback(NivelUsuario nivelUsuario);
     }
 
 
-    protected void createNivelUsuario(String id_usuario, String id_nivel, final NivelUsuarioCallback callback) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference nivelUserCollection = db.collection("nivel_user");
-        DocumentReference userDocument = nivelUserCollection.document(id_usuario + "_" + id_nivel);
+    protected void createNivelUsuario(String id_usuario, String id_nivel, Long i, final NivelUsuarioCallback callback) {
+        try {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference nivelUserCollection = db.collection("nivel_user");
+            DocumentReference userDocument = nivelUserCollection.document(id_usuario + "_" + id_nivel);
 
-        userDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "El documento nivel_user ya existe para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel);
-                        Map<String, Object> data = document.getData();
-                        if (data != null) {
-                            NivelUsuario nivelUsuario = NivelUsuario.fromMap(data);
-                            callback.onCallback(nivelUsuario);
+            userDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "El documento nivel_user ya existe para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel);
+                            Map<String, Object> data = document.getData();
+                            if (data != null) {
+                                try {
+                                    NivelUsuario nivelUsuario = NivelUsuario.fromMap(data);
+                                    callback.onCallback(nivelUsuario);
+                                } catch (Exception e) {
+                                    showDangerSnakBar("Error " + e.getMessage());
+                                }
+
+                            } else {
+                                callback.onCallback(null);
+                            }
                         } else {
-                            callback.onCallback(null);
+                            NivelUsuario nuevoNivelUsuario = new NivelUsuario(
+                                    id_usuario + "_" + id_nivel, id_usuario, id_nivel, "0", "false", "no_comenzado", i);
+
+                            userDocument.set(nuevoNivelUsuario.toMap())
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "Documento nivel_user creado exitosamente para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel);
+                                            callback.onCallback(nuevoNivelUsuario);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e(TAG, "Error al crear el documento nivel_user para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel, e);
+                                            callback.onCallback(null); // Manejar error adecuadamente
+                                        }
+                                    });
                         }
                     } else {
-                        NivelUsuario nuevoNivelUsuario = new NivelUsuario(
-                                id_usuario + "_" + id_nivel, id_usuario, id_nivel, "0", "false", "no_comenzado");
-
-                        userDocument.set(nuevoNivelUsuario.toMap())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d(TAG, "Documento nivel_user creado exitosamente para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel);
-                                        callback.onCallback(nuevoNivelUsuario);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e(TAG, "Error al crear el documento nivel_user para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel, e);
-                                        callback.onCallback(null); // Manejar error adecuadamente
-                                    }
-                                });
+                        Log.e(TAG, "Error al verificar la existencia del documento nivel_user para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel, task.getException());
+                        callback.onCallback(null); // Manejar error adecuadamente
                     }
-                } else {
-                    Log.e(TAG, "Error al verificar la existencia del documento nivel_user para el usuario con ID: " + id_usuario + " y ID de nivel: " + id_nivel, task.getException());
-                    callback.onCallback(null); // Manejar error adecuadamente
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            showDangerSnakBar("Error al cargar niveles: " + e.getMessage());
+        }
     }
 
 }
