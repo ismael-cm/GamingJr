@@ -59,7 +59,6 @@ public class Nivel1Activity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
         videoView = findViewById(R.id.videoView);
         btnSkipVideo = findViewById(R.id.btnSkipVideo);
-
         tvNombreNivel = findViewById(R.id.tvNombreNivel);
 
         getInitialData();
@@ -146,14 +145,7 @@ public class Nivel1Activity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        Button btnActualizarEstado = findViewById(R.id.btnActualizarEstado);
         Button btnAgregarPuntos = findViewById(R.id.btnAgregarPuntos);
-
-        btnActualizarEstado.setOnClickListener(v -> {
-            String nuevoEstado = "completado";  // Ejemplo de nuevo estado
-            actualizarEstadoEnFirestore(nuevoEstado);
-            nivelUsuario.setEstado(nuevoEstado);
-        });
 
         btnAgregarPuntos.setOnClickListener(v -> {
             int puntosActuales = Integer.parseInt(nivelUsuario.getPuntuacion());
@@ -161,8 +153,11 @@ public class Nivel1Activity extends AppCompatActivity {
 
             if(nuevosPuntos >= nivel.getPuntos_minimos()) {
                 setPlayVideo("final");
-            }
 
+                String nuevoEstado = "completado";
+                actualizarEstadoEnFirestore(nuevoEstado);
+                nivelUsuario.setEstado(nuevoEstado);
+            }
             actualizarPuntuacionEnFirestore(String.valueOf(nuevosPuntos));
             nivelUsuario.setPuntuacion(String.valueOf(nuevosPuntos));
         });
