@@ -226,7 +226,7 @@ public class Nivel1Activity extends AppCompatActivity {
             Log.i("Test", user.getUid());
             Log.i("Test", (nivel.getOrden()) + "");
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
+                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {

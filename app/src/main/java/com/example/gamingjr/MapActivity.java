@@ -91,6 +91,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void crearNiveles() {
         try {
+            Collections.sort(niveles, Comparator.comparingInt(Nivel::getOrden));
             levelsContainer.removeAllViews();
             levelsContainer.addView(videoButton);
             // Crear una vista alternada de título e imagen para cada nivel
