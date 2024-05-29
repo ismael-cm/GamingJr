@@ -40,6 +40,7 @@ public class Nivel1Activity extends AppCompatActivity {
 
     private VideoView videoView;
     private Button btnSkipVideo;
+    boolean isFinished = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +86,28 @@ public class Nivel1Activity extends AppCompatActivity {
         snackbar.show();
     }
 
+    private void showSnakBarNextLevel(String s) {
+        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_INDEFINITE);
+
+        // Configurar el botón "Siguiente nivel"
+        snackbar.setAction("Siguiente nivel", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Aquí puedes manejar la acción del botón, como pasar al siguiente nivel
+                nextLevel();
+            }
+        });
+
+        // Personalizar el texto del Snackbar
+        View snackbarView = snackbar.getView();
+        TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setTextSize(20);
+
+        snackbar.show();
+    }
+
+
+
     private void setupVideoView() {
         String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.nivel1final;
         Uri uri = Uri.parse(videoPath);
@@ -96,6 +119,9 @@ public class Nivel1Activity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 hideVideoView();
+                if(isFinished) {
+                    showSnakBarNextLevel("Nivel finalizado");
+                }
             }
         });
     }
@@ -108,6 +134,8 @@ public class Nivel1Activity extends AppCompatActivity {
             int videoResId = getResources().getIdentifier(nombreVideo, "raw", getPackageName());
             Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + videoResId);
             videoView.setVideoURI(videoUri);
+            //Bandera para saber que el nivel esta finalizado
+            if(compleme.equals("final")) isFinished = true;
             showVideoView();
         } catch (Exception e) {
             showSnakBar("Ocurrio un error en el video " + e.getMessage());
@@ -121,6 +149,7 @@ public class Nivel1Activity extends AppCompatActivity {
     }
 
     private void hideVideoView() {
+        showSnakBarNextLevel("Nivel finalizado");
         videoView.stopPlayback();
         videoView.setVisibility(View.GONE);
         btnSkipVideo.setVisibility(View.GONE);
@@ -177,5 +206,15 @@ public class Nivel1Activity extends AppCompatActivity {
         docRef.update("estado", nuevoEstado)
                 .addOnSuccessListener(aVoid -> showSnakBar("Estado actualizado a: " + nuevoEstado))
                 .addOnFailureListener(e -> showSnakBar("Error al actualizar estado: " + e.getMessage()));
+    }
+
+
+
+
+
+
+    // Método para manejar la acción de "Siguiente nivel"
+    private void nextLevel() {
+        //
     }
 }
