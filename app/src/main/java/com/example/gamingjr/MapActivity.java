@@ -76,12 +76,7 @@ public class MapActivity extends AppCompatActivity {
         niveles = juego.getNiveles();
 
         // Ordena la lista de niveles por el campo 'orden'
-        Collections.sort(niveles, new Comparator<Nivel>() {
-            @Override
-            public int compare(Nivel n1, Nivel n2) {
-                return Integer.compare(n1.getOrden(), n2.getOrden());
-            }
-        });
+
 
         // Añadir botón de ver video introducción
         videoButton = new Button(this);
@@ -91,7 +86,14 @@ public class MapActivity extends AppCompatActivity {
 
     private void crearNiveles() {
         try {
-            Collections.sort(niveles, Comparator.comparingInt(Nivel::getOrden));
+
+            Collections.sort(niveles, new Comparator<Nivel>() {
+                @Override
+                public int compare(Nivel n1, Nivel n2) {
+                    return Integer.compare(n1.getOrden(), n2.getOrden());
+                }
+            });
+
             levelsContainer.removeAllViews();
             levelsContainer.addView(videoButton);
             // Crear una vista alternada de título e imagen para cada nivel
