@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/rocket"
+        android:layout_height="48dp"
+        android:title="Inicio" />
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/profile"
+        android:layout_height="48dp"
+        android:title="Perfil" />
+    <item
+        android:id="@+id/nav_progreso"
+        android:layout_height="48dp"
+        android:icon="@drawable/progress"
+        android:title="Progreso" />
+</menu>

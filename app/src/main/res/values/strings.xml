@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">GamingJr</string>
+    <string name="acomp_anos_en_las_siguientes_aventuras">Acompáñanos en las siguientes aventuras</string>
+    <string name="iniciar_sesi_n">Iniciar Sesión</string>
+    <string name="pide_ayuda_a_tus_padres_para_iniciar_sesi_n">Pide ayuda a tus padres para iniciar sesión.</string>
+    <string name="no_tienes_cuenta_reg_strate_aqu">¿No tienes cuenta? Regístrate aquí</string>
+    <string name="pide_ayuda_a_tus_paderes_para_ingresar">Pide Ayuda a tus paderes para ingresar</string>
+    <string name="repite_la_contrase_a">Repite la Contraseña</string>
+    <string name="contrase_a">Contraseña</string>
+</resources>
