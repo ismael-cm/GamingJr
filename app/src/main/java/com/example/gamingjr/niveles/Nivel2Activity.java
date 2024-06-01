@@ -41,6 +41,7 @@ public class Nivel2Activity extends AppCompatActivity {
         // Inicializa el MediaPlayer para la música de fondo
         backgroundMusic = MediaPlayer.create(this, R.raw.fondo);
         backgroundMusic.setLooping(true); // Repite la música de fondo
+        backgroundMusic.setVolume(0.05f, 0.05f);
         backgroundMusic.start(); // Inicia la reproducción de la música de fondo
 
         gridView = findViewById(R.id.gridView);
