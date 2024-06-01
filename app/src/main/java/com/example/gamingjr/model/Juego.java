@@ -6,23 +6,23 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.gamingjr.HomeActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 public class Juego implements Serializable {
-    private  String nombre;
-    private  String id;
+    private String nombre;
+    private String id;
     private String subtitulo;
     private String thumbnail;
     public List<Juego> juegosList = new ArrayList<>();
@@ -83,14 +83,16 @@ public class Juego implements Serializable {
         this.thumbnail = thumbnail;
     }
 
-
     public Juego() {
         this.niveles = new ArrayList<>();
     }
+
     private static final String TAG = "Juego";
+
     public interface FirestoreCallback {
         void onCallback(List<Juego> juegosList);
     }
+
     public void getAll(final FirestoreCallback firestoreCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference juegos = db.collection("juegos");
@@ -145,7 +147,16 @@ public class Juego implements Serializable {
                                                         Log.e(TAG, "Error parsing document: " + nivelDocument.getId(), e);
                                                     }
                                                 }
-                                                juego.setNiveles(nivelesList); // Asignar la lista de niveles al juego
+
+                                                Collections.sort(nivelesList, new Comparator<Nivel>() {
+                                                    @Override
+                                                    public int compare(Nivel n1, Nivel n2) {
+                                                        return Integer.compare(n1.getOrden(), n2.getOrden()); // Cambiado para orden descendente
+                                                    }
+                                                });
+
+
+                                                juego.setNiveles(nivelesList); // Asignar la lista de niveles ordenados al juego
                                                 juegosList.add(juego);
 
                                                 // Verificar si se procesaron todos los juegos
@@ -174,5 +185,4 @@ public class Juego implements Serializable {
                     }
                 });
     }
-
 }
