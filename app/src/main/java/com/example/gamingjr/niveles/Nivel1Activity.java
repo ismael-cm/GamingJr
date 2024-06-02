@@ -205,11 +205,6 @@ public class Nivel1Activity extends AppCompatActivity {
                 .addOnFailureListener(e -> showSnakBar("Error al actualizar estado: " + e.getMessage()));
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     // Método para manejar la acción de "Siguiente nivel"
     private void nextLevel() {
         try {
