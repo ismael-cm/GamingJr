@@ -8,12 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.example.gamingjr.MainActivity;
 import com.example.gamingjr.R;
 import com.example.gamingjr.model.Card;
-import com.example.gamingjr.niveles.Nivel2Activity;
+import com.example.gamingjr.niveles.Nivel1Activity;
 
 import java.util.List;
 
@@ -130,7 +128,7 @@ public class CardAdapter extends BaseAdapter {
 
         if (allRevealed && gameEndListener != null) {
             gameEndListener.onGameEnd(cartasReveladas);
-            ((Nivel2Activity)context).stopBackgroundMusic();
+            ((Nivel1Activity)context).stopBackgroundMusic();
         }
     }
 

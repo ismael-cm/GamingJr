@@ -5,24 +5,20 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.gamingjr.R;
-import com.example.gamingjr.adapter.CardAdapter;
-import com.example.gamingjr.model.Card;
 import com.example.gamingjr.model.Nivel;
 import com.example.gamingjr.model.NivelUsuario;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,23 +33,15 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnGameEndListener {
+public class Nivel2Activity extends AppCompatActivity {
 
-
-    private GridView gridView;
-    private CardAdapter adapter;
-    private List<Card> cardList;
-    private int paresEncontrados = 0;
-    private MediaPlayer backgroundMusic;
-
-    //Parametros para
     String param1,param2,param3;
     FirebaseUser user;
     View rootView;
     private FirebaseAuth mAuth;
-
     FirebaseFirestore db;
     NivelUsuario nivelUsuario;
+    TextView tvNombreNivel;
     Nivel nivel;
 
     private VideoView videoView;
@@ -63,104 +51,29 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_nivel2);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        rootView = findViewById(android.R.id.content);
 
-        // Inicializa el MediaPlayer para la música de fondo
-        backgroundMusic = MediaPlayer.create(this, R.raw.fondo);
-        backgroundMusic.setLooping(true); // Repite la música de fondo
-        backgroundMusic.setVolume(0.05f, 0.05f);
-        backgroundMusic.start(); // Inicia la reproducción de la música de fondo
+        // Inicializar Firebase
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        videoView = findViewById(R.id.videoView);
+        btnSkipVideo = findViewById(R.id.btnSkipVideo);
+        tvNombreNivel = findViewById(R.id.tvNombreNivel);
 
-        gridView = findViewById(R.id.gridView);
-        cardList = new ArrayList<>();
-
-        // Define las imágenes y los audios de las cartas
-        int[] images = {
-                R.drawable.one, R.drawable.two, R.drawable.three, R.drawable.cuatro, R.drawable.cinco, R.drawable.seis
-        };
-
-        int[] audios = {
-                R.raw.uno, R.raw.dos, R.raw.tres, R.raw.cuatro, R.raw.cinco, R.raw.seis
-        };
-
-        // Agrega pares de cartas a la lista
-        int id = 1;
-        for (int i = 0; i < images.length; i++) {
-            cardList.add(new Card(id, images[i], audios[i]));
-            cardList.add(new Card(id, images[i], audios[i]));
-            id++;
-        }
-
-        // Baraja las cartas
-        Collections.shuffle(cardList);
-
-        adapter = new CardAdapter(this, cardList);
-        gridView.setAdapter(adapter);
-
-
-        //Agregado para video
-        try {
-            rootView = findViewById(android.R.id.content);
-
-            // Inicializar Firebase
-            db = FirebaseFirestore.getInstance();
-            mAuth = FirebaseAuth.getInstance();
-            user = mAuth.getCurrentUser();
-            videoView = findViewById(R.id.videoView);
-            btnSkipVideo = findViewById(R.id.btnSkipVideo);
-
-            getInitialData();
-            setupVideoView();
-        } catch (Exception e) {
-            Log.e("Nivel2", e.getMessage());
-            showSnakBar(e.getMessage());
-        }
-        adapter = new CardAdapter(this, cardList);
-        adapter.setOnGameEndListener(this);
-        gridView.setAdapter(adapter);
+        getInitialData();
+        setupButtons();
+        setupVideoView();
     }
 
     @Override
-    public void onGameEnd(int cartasReveladas) {
-
-        if(cartasReveladas <= nivel.getPuntos_minimos()) {
-            setPlayVideo("final");
-
-            String nuevoEstado = "completado";
-            actualizarEstadoEnFirestore(nuevoEstado);
-            nivelUsuario.setEstado(nuevoEstado);
-
-            actualizarPuntuacionEnFirestore(String.valueOf(cartasReveladas));
-            nivelUsuario.setPuntuacion(String.valueOf(cartasReveladas));
-            return;
-        }
-
-        onLose();
-
-    }
-
-
-    @Override
-    public void getIntentos(int cartasReveladas) {
-        TextView vtConteo = findViewById(R.id.tvConteo);
-        vtConteo.setText(cartasReveladas + " Cartas levantadas");
-
-        Log.e("Nivel2", nivel.getPuntos_minimos() + "");
-        if(cartasReveladas >= nivel.getPuntos_minimos()){
-            onLose();
-        }
-    }
-
-    private void onLose() {
-        showDangerSnakBar("Juego termindao, haz alcanzado el limite de cartas leventadas. Sigue intentando");
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                recreate();
-            }
-        }, 5000);
-    }
-
     protected void onResume() {
         super.onResume();
 
@@ -169,39 +82,19 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
         //Reproducir video de introduccion.
         setPlayVideo("intro");
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Detiene la reproducción de la música de fondo cuando se destruye la actividad
-        if (backgroundMusic != null) {
-            backgroundMusic.stop();
-            backgroundMusic.release();
-        }
-    }
 
-    // Método para detener la música de fondo cuando se encuentran todos los pares
-    public void stopBackgroundMusic() {
-        if (backgroundMusic != null) {
-            backgroundMusic.stop();
-        }
-    }
-
-
-
-    //Funciones privadas agregadas para video.
-
-    private void showSnakBar(String s) {
+    private void showSnakBar(String s, int color) {
         Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
-        snackbar.setBackgroundTint(Color.GREEN);
+        snackbar.setBackgroundTint(color);
         View snackbarView = snackbar.getView();
         TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(20);
         snackbar.show();
     }
 
-    private void showDangerSnakBar(String s) {
-        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_LONG);
-        snackbar.setBackgroundTint(Color.RED);
+    private void showSnakBar(String s) {
+        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
+        snackbar.setBackgroundTint(Color.GREEN);
         View snackbarView = snackbar.getView();
         TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(20);
@@ -229,7 +122,6 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
     private void setPlayVideo(String compleme) {
         try {
             String nombreVideo = nivel.getVideo() + compleme;
-            Log.e("Nivel2", nivel.getVideo());
 
             // Obtener el URI del video
             int videoResId = getResources().getIdentifier(nombreVideo, "raw", getPackageName());
@@ -242,7 +134,6 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
             showSnakBar("Ocurrio un error en el video " + e.getMessage());
         }
     }
-
 
     private void showVideoView() {
         videoView.setVisibility(View.VISIBLE);
@@ -265,12 +156,34 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
             param3 = intent.getStringExtra("param1");
             nivelUsuario = (NivelUsuario) intent.getSerializableExtra("nivelUsuario");
             nivel = (Nivel) intent.getSerializableExtra("nivel");
+            cargarNombreNivel();
         } catch (Exception e) {
             showSnakBar("Ocurrio un error>: " + e.getMessage());
         }
     }
 
+    private void cargarNombreNivel() {
+        tvNombreNivel.setText(nivel.getNombre());
+    }
 
+    private void setupButtons() {
+        Button btnAgregarPuntos = findViewById(R.id.btnAgregarPuntos);
+
+        btnAgregarPuntos.setOnClickListener(v -> {
+            int puntosActuales = Integer.parseInt(nivelUsuario.getPuntuacion());
+            int nuevosPuntos = puntosActuales + 5;
+
+            if(nuevosPuntos >= nivel.getPuntos_minimos()) {
+                setPlayVideo("final");
+
+                String nuevoEstado = "completado";
+                actualizarEstadoEnFirestore(nuevoEstado);
+                nivelUsuario.setEstado(nuevoEstado);
+            }
+            actualizarPuntuacionEnFirestore(String.valueOf(nuevosPuntos));
+            nivelUsuario.setPuntuacion(String.valueOf(nuevosPuntos));
+        });
+    }
 
     // Método para actualizar puntuación en Firestore
     private void actualizarPuntuacionEnFirestore(String nuevaPuntuacion) {
@@ -301,7 +214,7 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
             Log.i("Test", user.getUid());
             Log.i("Test", (nivel.getOrden()) + "");
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
+                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
@@ -327,6 +240,4 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
         }
 
     }
-
-
 }
