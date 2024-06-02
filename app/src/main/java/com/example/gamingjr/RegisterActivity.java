@@ -168,7 +168,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         db.collection("users").document(uid).set(userMap)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(RegisterActivity.this, "Perfil guardado en Firestore", Toast.LENGTH_SHORT).show();
                     // Redirigir a la pantalla de inicio
                     Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
                     startActivity(intent);

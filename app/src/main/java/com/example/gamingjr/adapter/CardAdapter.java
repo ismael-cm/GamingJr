@@ -82,7 +82,7 @@ public class CardAdapter extends BaseAdapter {
 
             // Incrementar el contador de cartas reveladas
             cartasReveladas++;
-            Toast.makeText(context, "Cartas Reveladas " + cartasReveladas , Toast.LENGTH_SHORT).show();
+            gameEndListener.getIntentos(cartasReveladas);
 
             if (firstSelectedCard == null) {
                 firstSelectedCard = card;
@@ -137,6 +137,7 @@ public class CardAdapter extends BaseAdapter {
 
     public interface OnGameEndListener {
         void onGameEnd(int cartasReveladas);
+        void getIntentos(int cartasReveladas);
     }
 }
 

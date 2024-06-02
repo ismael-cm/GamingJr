@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -121,9 +122,43 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
 
     @Override
     public void onGameEnd(int cartasReveladas) {
-        final int puntuacionPerfecta = 20;
-        int puntuacion = (cartasReveladas/puntuacionPerfecta) * 100;
-        showSnakBar("¡Juego terminado! Todos los pares encontrados. Cartas: " + cartasReveladas);
+
+        if(cartasReveladas <= nivel.getPuntos_minimos()) {
+            setPlayVideo("final");
+
+            String nuevoEstado = "completado";
+            actualizarEstadoEnFirestore(nuevoEstado);
+            nivelUsuario.setEstado(nuevoEstado);
+
+            actualizarPuntuacionEnFirestore(String.valueOf(cartasReveladas));
+            nivelUsuario.setPuntuacion(String.valueOf(cartasReveladas));
+            return;
+        }
+
+        onLose();
+
+    }
+
+
+    @Override
+    public void getIntentos(int cartasReveladas) {
+        TextView vtConteo = findViewById(R.id.tvConteo);
+        vtConteo.setText(cartasReveladas + " Cartas levantadas");
+
+        Log.e("Nivel2", nivel.getPuntos_minimos() + "");
+        if(cartasReveladas >= nivel.getPuntos_minimos()){
+            onLose();
+        }
+    }
+
+    private void onLose() {
+        showDangerSnakBar("Juego termindao, haz alcanzado el limite de cartas leventadas. Sigue intentando");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                recreate();
+            }
+        }, 5000);
     }
 
     protected void onResume() {
@@ -158,6 +193,15 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
     private void showSnakBar(String s) {
         Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_SHORT);
         snackbar.setBackgroundTint(Color.GREEN);
+        View snackbarView = snackbar.getView();
+        TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setTextSize(20);
+        snackbar.show();
+    }
+
+    private void showDangerSnakBar(String s) {
+        Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_LONG);
+        snackbar.setBackgroundTint(Color.RED);
         View snackbarView = snackbar.getView();
         TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(20);
@@ -199,20 +243,7 @@ public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnG
         }
     }
 
-    private void agregarPuntosYGanar() {
-        int puntosActuales = Integer.parseInt(nivelUsuario.getPuntuacion());
-        int nuevosPuntos = 100;
 
-        if(nuevosPuntos >= nivel.getPuntos_minimos()) {
-            setPlayVideo("final");
-
-            String nuevoEstado = "completado";
-            actualizarEstadoEnFirestore(nuevoEstado);
-            nivelUsuario.setEstado(nuevoEstado);
-        }
-        actualizarPuntuacionEnFirestore(String.valueOf(nuevosPuntos));
-        nivelUsuario.setPuntuacion(String.valueOf(nuevosPuntos));
-    }
     private void showVideoView() {
         videoView.setVisibility(View.VISIBLE);
         btnSkipVideo.setVisibility(View.VISIBLE);
