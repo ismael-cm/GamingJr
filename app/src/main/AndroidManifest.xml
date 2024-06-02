@@ -19,6 +19,9 @@
             android:name=".niveles.Nivel2Activity"
             android:exported="false" />
         <activity
+            android:name=".niveles.Nivel3Activity"
+            android:exported="false" />
+        <activity
             android:name=".VideoIntroduccionActivity"
             android:exported="false" />
         <activity
