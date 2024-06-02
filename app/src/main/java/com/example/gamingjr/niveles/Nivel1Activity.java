@@ -45,6 +45,7 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
     private List<Card> cardList;
     private int paresEncontrados = 0;
     private MediaPlayer backgroundMusic;
+    private MediaPlayer loseAudio;
 
     //Parametros para
     String param1,param2,param3;
@@ -55,6 +56,7 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
     FirebaseFirestore db;
     NivelUsuario nivelUsuario;
     Nivel nivel;
+    public boolean lose = false;
 
     private VideoView videoView;
     private Button btnSkipVideo;
@@ -152,13 +154,21 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
     }
 
     private void onLose() {
-        showDangerSnakBar("Juego termindao, haz alcanzado el limite de cartas leventadas. Sigue intentando");
+        if(lose) {
+            return;
+        }
+
+        showWarningSnakBar("Juego termindado!");
+        loseAudio = MediaPlayer.create(this, R.raw.lose);
+        loseAudio.start();
+
+        lose = true;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 recreate();
             }
-        }, 5000);
+        }, 10000);
     }
 
     protected void onResume() {
@@ -176,6 +186,11 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
         if (backgroundMusic != null) {
             backgroundMusic.stop();
             backgroundMusic.release();
+        }
+
+        if(loseAudio != null) {
+            loseAudio.stop();
+            loseAudio.release();
         }
     }
 
@@ -199,9 +214,9 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
         snackbar.show();
     }
 
-    private void showDangerSnakBar(String s) {
+    private void showWarningSnakBar(String s) {
         Snackbar snackbar = Snackbar.make(rootView, s, Snackbar.LENGTH_LONG);
-        snackbar.setBackgroundTint(Color.RED);
+        snackbar.setBackgroundTint(Color.YELLOW);
         View snackbarView = snackbar.getView();
         TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(20);
