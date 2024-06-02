@@ -12,20 +12,15 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.gamingjr.R;
 import com.example.gamingjr.adapter.CardAdapter;
-import com.example.gamingjr.model.AuthListener;
 import com.example.gamingjr.model.Card;
 import com.example.gamingjr.model.Nivel;
 import com.example.gamingjr.model.NivelUsuario;
@@ -41,7 +36,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class Nivel2Activity extends AppCompatActivity {
+public class Nivel2Activity extends AppCompatActivity implements CardAdapter.OnGameEndListener {
 
 
     private GridView gridView;
@@ -119,7 +114,18 @@ public class Nivel2Activity extends AppCompatActivity {
             Log.e("Nivel2", e.getMessage());
             showSnakBar(e.getMessage());
         }
+        adapter = new CardAdapter(this, cardList);
+        adapter.setOnGameEndListener(this);
+        gridView.setAdapter(adapter);
     }
+
+    @Override
+    public void onGameEnd(int cartasReveladas) {
+        final int puntuacionPerfecta = 20;
+        int puntuacion = (cartasReveladas/puntuacionPerfecta) * 100;
+        showSnakBar("¡Juego terminado! Todos los pares encontrados. Cartas: " + cartasReveladas);
+    }
+
     protected void onResume() {
         super.onResume();
 

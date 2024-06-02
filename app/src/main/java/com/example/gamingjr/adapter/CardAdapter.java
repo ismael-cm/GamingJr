@@ -24,10 +24,17 @@ public class CardAdapter extends BaseAdapter {
     private Card secondSelectedCard = null;
     private Handler handler = new Handler();
     private MediaPlayer mediaPlayer;
+    private OnGameEndListener gameEndListener;
+    private int cartasReveladas = 0;
 
     public CardAdapter(Context context, List<Card> cards) {
         this.context = context;
         this.cards = cards;
+    }
+
+    // Método para establecer el listener
+    public void setOnGameEndListener(OnGameEndListener listener) {
+        this.gameEndListener = listener;
     }
 
     @Override
@@ -73,6 +80,10 @@ public class CardAdapter extends BaseAdapter {
             notifyDataSetChanged();
             playSound(card.getAudioResId());
 
+            // Incrementar el contador de cartas reveladas
+            cartasReveladas++;
+            Toast.makeText(context, "Cartas Reveladas " + cartasReveladas , Toast.LENGTH_SHORT).show();
+
             if (firstSelectedCard == null) {
                 firstSelectedCard = card;
             } else {
@@ -80,7 +91,7 @@ public class CardAdapter extends BaseAdapter {
                 handler.postDelayed(this::checkMatch, 1000);
             }
         });
-
+        checkGameEnd();
         return convertView;
     }
 
@@ -117,13 +128,15 @@ public class CardAdapter extends BaseAdapter {
             }
         }
 
-        if (allRevealed) {
-
-            Toast.makeText(context, "El juego ha terminado!", Toast.LENGTH_SHORT).show();
+        if (allRevealed && gameEndListener != null) {
+            gameEndListener.onGameEnd(cartasReveladas);
             ((Nivel2Activity)context).stopBackgroundMusic();
         }
     }
 
 
+    public interface OnGameEndListener {
+        void onGameEnd(int cartasReveladas);
+    }
 }
 
