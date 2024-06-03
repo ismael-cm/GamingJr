@@ -2,18 +2,24 @@ package com.example.gamingjr.niveles;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -33,6 +39,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 public class Nivel2Activity extends AppCompatActivity {
 
     String param1,param2,param3;
@@ -47,6 +58,8 @@ public class Nivel2Activity extends AppCompatActivity {
     private VideoView videoView;
     private Button btnSkipVideo;
     boolean isFinished = false;
+    private final List<Integer> imageResources = new ArrayList<>();
+    private int pairsFound = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +71,60 @@ public class Nivel2Activity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        //Codigo de marvin
+        imageResources.add(R.drawable.lunch);
+        imageResources.add(R.drawable.cabin);
+        imageResources.add(R.drawable.suit);
+        imageResources.add(R.drawable.despegar);
+        imageResources.add(R.drawable.base);
+        imageResources.add(R.drawable.lunch);
+        imageResources.add(R.drawable.cabin);
+        imageResources.add(R.drawable.suit);
+        imageResources.add(R.drawable.despegar);
+        imageResources.add(R.drawable.base);
+
+        // Añadir más imágenes en pares aquí
+
+        // Mezclar las imágenes
+        Collections.shuffle(imageResources);
+
+        // Obtener el GridLayout del layout
+        GridLayout gridLayout = findViewById(R.id.grid_layout);
+
+        // Configurar parámetros de Layout
+        int numColumns = gridLayout.getColumnCount();
+        int numRows = gridLayout.getRowCount();
+        int totalCells = numColumns * numRows;
+
+        // Crear ImageViews y añadirlas al GridLayout
+        for (int i = 0; i < totalCells && i < imageResources.size(); i++) {
+            int imageRes = imageResources.get(i);
+            ImageView imageView = new ImageView(this);
+            imageView.setImageDrawable(ContextCompat.getDrawable(this, imageRes));
+
+            // Configurar el tamaño de las imágenes
+            int imageSize = getResources().getDisplayMetrics().widthPixels / numColumns;
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = imageSize;
+            params.height = imageSize;
+            params.setMargins(-5, 10, -5, 10);
+            imageView.setLayoutParams(params);
+
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setPadding(20, 20, 20, 20); // Ajustar padding si es necesario
+            imageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                    v.startDragAndDrop(null, shadowBuilder, v, 0);
+                    return true;
+                }
+            });
+            imageView.setOnDragListener(new DragListener());
+            gridLayout.addView(imageView);
+        }
+
+
         rootView = findViewById(android.R.id.content);
 
         // Inicializar Firebase
@@ -71,6 +138,43 @@ public class Nivel2Activity extends AppCompatActivity {
         getInitialData();
         setupButtons();
         setupVideoView();
+    }
+
+    private class DragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View view, DragEvent dragEvent) {
+            switch (dragEvent.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    return true;
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    view.setAlpha(0.5f);
+                    return true;
+                case DragEvent.ACTION_DRAG_EXITED:
+                    view.setAlpha(1.0f);
+                    return true;
+                case DragEvent.ACTION_DROP:
+                    View draggedView = (View) dragEvent.getLocalState();
+                    Drawable draggedImage = ((ImageView) draggedView).getDrawable();
+                    Drawable targetImage = ((ImageView) view).getDrawable();
+
+                    if (Objects.equals(draggedImage.getConstantState(), targetImage.getConstantState())) {
+                        draggedView.setVisibility(View.INVISIBLE);
+                        view.setVisibility(View.INVISIBLE);
+                        pairsFound++;
+                        if (pairsFound == imageResources.size() / 2) {
+                            Toast.makeText(Nivel2Activity.this, "Has avanzado de nivel, suerte en tu viaje astronauta", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        view.setAlpha(1.0f);
+                    }
+                    return true;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    view.setAlpha(1.0f);
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.gamingjr.niveles;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.example.gamingjr.JuegoActivity;
+import com.example.gamingjr.MapActivity;
 import com.example.gamingjr.R;
 import com.example.gamingjr.adapter.CardAdapter;
 import com.example.gamingjr.model.Card;
@@ -47,6 +50,8 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
     private MediaPlayer backgroundMusic;
     private MediaPlayer loseAudio;
 
+    Button btnniveles;
+
     //Parametros para
     String param1,param2,param3;
     FirebaseUser user;
@@ -62,10 +67,13 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
     private Button btnSkipVideo;
     boolean isFinished = false;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nivel1);
+
+        btnniveles=findViewById(R.id.btnniveles);
 
         // Inicializa el MediaPlayer para la música de fondo
         backgroundMusic = MediaPlayer.create(this, R.raw.fondo);
@@ -120,6 +128,14 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
         adapter = new CardAdapter(this, cardList);
         adapter.setOnGameEndListener(this);
         gridView.setAdapter(adapter);
+
+        btnniveles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(Nivel1Activity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
