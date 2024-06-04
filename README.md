@@ -11,6 +11,10 @@ Este proyecto es una aplicación de juegos educativos diseñada para niños de e
 - **Juegos de Colores:** Introduce a los niños a los diferentes colores y sus nombres.
 - **Juegos de Formas:** Ayuda a los niños a identificar y nombrar formas geométricas básicas.
 
+![Imagen de WhatsApp 2024-06-04 a las 21 32 36_1e4c109a](https://github.com/ismael-cm/GamingJr/assets/88692059/4b6cf71d-66a2-43d8-b796-8c137f9196dd)
+![Imagen de WhatsApp 2024-06-04 a las 21 32 36_979ab77f](https://github.com/ismael-cm/GamingJr/assets/88692059/97216390-9bbf-411a-a643-7b1572eaf7a2)
+
+
 ## Instalación y Ejecución
 
 Para clonar y ejecutar este proyecto en Android Studio, sigue estos pasos:
@@ -26,4 +30,6 @@ Para clonar y ejecutar este proyecto en Android Studio, sigue estos pasos:
 
    Abre una terminal y ejecuta el siguiente comando:
    ```sh
-   [git clone https://github.com/tu-usuario/tu-repositorio.git](https://github.com/ismael-cm/GamingJr.git)
+   git clone https://github.com/ismael-cm/GamingJr.git
+
+
