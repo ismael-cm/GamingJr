@@ -26,4 +26,4 @@ Para clonar y ejecutar este proyecto en Android Studio, sigue estos pasos:
 
    Abre una terminal y ejecuta el siguiente comando:
    ```sh
-   git clone https://github.com/tu-usuario/tu-repositorio.git
+   [git clone https://github.com/tu-usuario/tu-repositorio.git](https://github.com/ismael-cm/GamingJr.git)
