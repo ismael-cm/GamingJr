@@ -1,6 +1,7 @@
 package com.example.gamingjr.niveles;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -44,7 +45,7 @@ public class Nivel3Activity extends AppCompatActivity {
     TextView tvNombreNivel;
     Nivel nivel;
 
-    private VideoView videoView;
+    private VideoView videoView, videoCansion;
     private Button btnSkipVideo;
     boolean isFinished = false;
 
@@ -58,6 +59,8 @@ public class Nivel3Activity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         rootView = findViewById(android.R.id.content);
 
         // Inicializar Firebase
@@ -65,22 +68,25 @@ public class Nivel3Activity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         videoView = findViewById(R.id.videoView);
+        videoCansion = findViewById(R.id.videoCansion);
         btnSkipVideo = findViewById(R.id.btnSkipVideo);
         tvNombreNivel = findViewById(R.id.tvNombreNivel);
 
         getInitialData();
         setupButtons();
         setupVideoView();
+
+        setPlayVideo("intro");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
 
-        showSnakBar("Iniciando bien con puntuacion " + nivelUsuario.getPuntuacion());
-
-        //Reproducir video de introduccion.
-        setPlayVideo("intro");
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     private void showSnakBar(String s, int color) {
@@ -103,20 +109,61 @@ public class Nivel3Activity extends AppCompatActivity {
 
     private void setupVideoView() {
         String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.nivel1final;
+        String cansionUriPath = "android.resource://" + getPackageName() + "/" + R.raw.cansionnumeros;
         Uri uri = Uri.parse(videoPath);
+        Uri cansionUri = Uri.parse(cansionUriPath);
         videoView.setVideoURI(uri);
+        videoCansion.setVideoURI(cansionUri);
 
         videoView.setOnCompletionListener(mp -> hideVideoView());
         btnSkipVideo.setOnClickListener(v -> hideVideoView());
+
+        btnSkipVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideVideoView();
+                if(isFinished) {
+                    nextLevel();
+                } else  {
+                    ejecutarCansion();
+                }
+            }
+        });
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 hideVideoView();
                 if(isFinished) {
                     nextLevel();
+                } else  {
+                    ejecutarCansion();
                 }
             }
         });
+
+        videoCansion.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                videoCansion.setVisibility(View.GONE);
+                setPlayVideo("final");
+
+                String nuevoEstado = "completado";
+                actualizarEstadoEnFirestore(nuevoEstado);
+                nivelUsuario.setEstado(nuevoEstado);
+
+
+                int puntosActuales = Integer.parseInt(nivelUsuario.getPuntuacion());
+                int nuevosPuntos = puntosActuales + 100;
+                actualizarPuntuacionEnFirestore(String.valueOf(nuevosPuntos));
+                nivelUsuario.setPuntuacion(String.valueOf(nuevosPuntos));
+            }
+        });
+    }
+
+    private void ejecutarCansion() {
+
+        videoCansion.setVisibility(View.VISIBLE);
+        videoCansion.start();
     }
 
     private void setPlayVideo(String compleme) {
@@ -142,7 +189,9 @@ public class Nivel3Activity extends AppCompatActivity {
     }
 
     private void hideVideoView() {
-        if (isFinished) nextLevel();
+        if (isFinished){
+            nextLevel();
+        };
         videoView.stopPlayback();
         videoView.setVisibility(View.GONE);
         btnSkipVideo.setVisibility(View.GONE);
