@@ -24,6 +24,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.gamingjr.MapActivity;
 import com.example.gamingjr.R;
 import com.example.gamingjr.model.Nivel;
 import com.example.gamingjr.model.NivelUsuario;
@@ -46,7 +47,7 @@ import java.util.Objects;
 
 public class Nivel2Activity extends AppCompatActivity {
 
-    String param1,param2,param3;
+    String param1, param2, param3;
     FirebaseUser user;
     View rootView;
     private FirebaseAuth mAuth;
@@ -54,7 +55,7 @@ public class Nivel2Activity extends AppCompatActivity {
     NivelUsuario nivelUsuario;
     TextView tvNombreNivel;
     Nivel nivel;
-
+    Button btnNiveles;
     private MediaPlayer backgroundMusic;
     private VideoView videoView;
     private Button btnSkipVideo;
@@ -73,12 +74,23 @@ public class Nivel2Activity extends AppCompatActivity {
             return insets;
         });
 
+btnNiveles= findViewById(R.id.btnNiveles);
+        btnNiveles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Nivel2Activity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         // Inicializa el MediaPlayer para la música de fondo marvin y cubias
         backgroundMusic = MediaPlayer.create(this, R.raw.fondo);
         backgroundMusic.setLooping(true); // Repite la música de fondo
         backgroundMusic.setVolume(0.05f, 0.05f);
         backgroundMusic.start(); // Inicia la reproducción de la música de fondo
+
+
 
         //Codigo de marvin
         imageResources.add(R.drawable.lunch);
@@ -128,9 +140,15 @@ public class Nivel2Activity extends AppCompatActivity {
                     v.startDragAndDrop(null, shadowBuilder, v, 0);
                     return true;
                 }
+
+
+
+
             });
             imageView.setOnDragListener(new DragListener());
             gridLayout.addView(imageView);
+
+
         }
 
 
@@ -142,12 +160,16 @@ public class Nivel2Activity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
         videoView = findViewById(R.id.videoView);
         btnSkipVideo = findViewById(R.id.btnSkipVideo);
-        tvNombreNivel = findViewById(R.id.tvNombreNivel);
+
 
         getInitialData();
         setupButtons();
         setupVideoView();
+
     }
+
+
+
 
     private class DragListener implements View.OnDragListener {
         @Override
@@ -172,10 +194,24 @@ public class Nivel2Activity extends AppCompatActivity {
                         pairsFound++;
                         if (pairsFound == imageResources.size() / 2) {
                             Toast.makeText(Nivel2Activity.this, "Has avanzado de nivel, suerte en tu viaje astronauta", Toast.LENGTH_LONG).show();
+                            int puntosActuales = Integer.parseInt(nivelUsuario.getPuntuacion());
+                            int nuevosPuntos = puntosActuales + 105;
+
+
+                                setPlayVideo("final");
+
+                                String nuevoEstado = "completado";
+                                actualizarEstadoEnFirestore(nuevoEstado);
+                                nivelUsuario.setEstado(nuevoEstado);
+
+
+                            actualizarPuntuacionEnFirestore(String.valueOf(nuevosPuntos));
+                            nivelUsuario.setPuntuacion(String.valueOf(nuevosPuntos));
                         }
                     } else {
                         view.setAlpha(1.0f);
                     }
+
                     return true;
                 case DragEvent.ACTION_DRAG_ENDED:
                     view.setAlpha(1.0f);
@@ -183,8 +219,11 @@ public class Nivel2Activity extends AppCompatActivity {
                 default:
                     return false;
             }
+
         }
+
     }
+
 
     @Override
     protected void onResume() {
@@ -273,7 +312,13 @@ public class Nivel2Activity extends AppCompatActivity {
         } catch (Exception e) {
             showSnakBar("Ocurrio un error>: " + e.getMessage());
         }
+
+
+
     }
+
+
+
 
     private void cargarNombreNivel() {
         tvNombreNivel.setText(nivel.getNombre());
@@ -283,20 +328,11 @@ public class Nivel2Activity extends AppCompatActivity {
         Button btnAgregarPuntos = findViewById(R.id.btnAgregarPuntos);
 
         btnAgregarPuntos.setOnClickListener(v -> {
-            int puntosActuales = Integer.parseInt(nivelUsuario.getPuntuacion());
-            int nuevosPuntos = puntosActuales + 5;
 
-            if(nuevosPuntos >= nivel.getPuntos_minimos()) {
-                setPlayVideo("final");
-
-                String nuevoEstado = "completado";
-                actualizarEstadoEnFirestore(nuevoEstado);
-                nivelUsuario.setEstado(nuevoEstado);
-            }
-            actualizarPuntuacionEnFirestore(String.valueOf(nuevosPuntos));
-            nivelUsuario.setPuntuacion(String.valueOf(nuevosPuntos));
         });
     }
+
+
 
     // Método para actualizar puntuación en Firestore
     private void actualizarPuntuacionEnFirestore(String nuevaPuntuacion) {
@@ -345,6 +381,8 @@ public class Nivel2Activity extends AppCompatActivity {
             });
 
 
+
+
             finish();
 
         } catch (Exception e) {
@@ -353,4 +391,5 @@ public class Nivel2Activity extends AppCompatActivity {
         }
 
     }
+
 }
