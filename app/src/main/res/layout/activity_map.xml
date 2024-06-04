@@ -1,20 +1,22 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg3">
+    android:background="@drawable/nivelesfondo4">
+
 
     <!-- Linea divisoria en el fondo -->
     <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
+        android:layout_width="9dp"
+        android:layout_height="661dp"
 
         android:layout_gravity="center_horizontal"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <!-- Contenedor de los niveles -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="663dp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -25,10 +27,16 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
 
-
-
         </LinearLayout>
 
     </ScrollView>
 
+    <Button
+        android:id="@+id/btnRegresar"
+        android:layout_width="210dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:backgroundTint="@color/naranjaclaro"
+        android:text="REGRESAR"
+        android:textSize="30dp"/>
 </FrameLayout>

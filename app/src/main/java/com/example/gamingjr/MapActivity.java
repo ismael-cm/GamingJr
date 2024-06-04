@@ -42,8 +42,11 @@ import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 import android.widget.VideoView;
 
+import org.checkerframework.common.subtyping.qual.Bottom;
+
 public class MapActivity extends AppCompatActivity {
 
+    Button btnRegresar;
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
     boolean isTitleOnLeft = true;
@@ -56,10 +59,14 @@ public class MapActivity extends AppCompatActivity {
     Long count = 0L;
     FirebaseUser user;
     View rootView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        btnRegresar=findViewById(R.id.btnRegresar);
 
         db = FirebaseFirestore.getInstance();
         // Inicializar FirebaseAuth
@@ -79,6 +86,15 @@ public class MapActivity extends AppCompatActivity {
         videoButton = new Button(this);
         videoButton.setText("Ver Video Introducción");
         levelsContainer.addView(videoButton);
+        btnRegresar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MapActivity.this, HomeActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
     }
 
     private void crearNiveles() {
@@ -222,6 +238,8 @@ public class MapActivity extends AppCompatActivity {
                 playIntro();
             }
         });
+
+
     }
 
     @Override

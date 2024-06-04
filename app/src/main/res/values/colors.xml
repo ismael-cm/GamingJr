@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#003285</color>
     <color name="warning_background">#FFBF00</color>
+    <color name="naranjaclaro">#E8957B</color>
 </resources>
