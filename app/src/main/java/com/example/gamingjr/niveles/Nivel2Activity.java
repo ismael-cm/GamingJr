@@ -55,6 +55,7 @@ public class Nivel2Activity extends AppCompatActivity {
     TextView tvNombreNivel;
     Nivel nivel;
 
+    private MediaPlayer backgroundMusic;
     private VideoView videoView;
     private Button btnSkipVideo;
     boolean isFinished = false;
@@ -71,6 +72,14 @@ public class Nivel2Activity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
+        // Inicializa el MediaPlayer para la música de fondo marvin y cubias
+        backgroundMusic = MediaPlayer.create(this, R.raw.fondo);
+        backgroundMusic.setLooping(true); // Repite la música de fondo
+        backgroundMusic.setVolume(0.05f, 0.05f);
+        backgroundMusic.start(); // Inicia la reproducción de la música de fondo
+
         //Codigo de marvin
         imageResources.add(R.drawable.lunch);
         imageResources.add(R.drawable.cabin);

@@ -75,7 +75,7 @@ public class Nivel1Activity extends AppCompatActivity implements CardAdapter.OnG
 
         btnniveles=findViewById(R.id.btnniveles);
 
-        // Inicializa el MediaPlayer para la música de fondo
+        // Inicializa el MediaPlayer para la música de fondo marvin y cubias
         backgroundMusic = MediaPlayer.create(this, R.raw.fondo);
         backgroundMusic.setLooping(true); // Repite la música de fondo
         backgroundMusic.setVolume(0.05f, 0.05f);
