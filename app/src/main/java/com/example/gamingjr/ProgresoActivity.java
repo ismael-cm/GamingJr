@@ -1,5 +1,7 @@
 package com.example.gamingjr;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +24,7 @@ public class ProgresoActivity extends AppCompatActivity {
     private List<Juego> juegosList;
 
     private FirebaseFirestore db;
+    Button btnRegresar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,13 @@ public class ProgresoActivity extends AppCompatActivity {
         expandableListView = findViewById(R.id.expandableListView);
         expandableAdapter = new ProgresoExpandableAdapter();
         expandableListView.setAdapter(expandableAdapter);
+        btnRegresar = findViewById(R.id.btnRegresar);
+        btnRegresar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         juegosList = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
