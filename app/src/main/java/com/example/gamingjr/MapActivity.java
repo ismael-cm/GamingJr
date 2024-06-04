@@ -4,8 +4,10 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -120,6 +122,9 @@ public class MapActivity extends AppCompatActivity {
 
                         TextView titleView = new TextView(MapActivity.this);
                         titleView.setText(nivel.getNombre());
+                        titleView.setTextColor(Color.WHITE);
+                        titleView.setTypeface(null, Typeface.BOLD); // Establece el texto en negrita
+                        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
                         titleView.setLayoutParams(new LinearLayout.LayoutParams(
                                 0,
                                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -137,6 +142,8 @@ public class MapActivity extends AppCompatActivity {
                         }
                         int imageResId = getResources().getIdentifier(imageName, "drawable", getPackageName());
                         imageView.setImageResource(imageResId);
+                        imageView.setBackgroundResource(R.drawable.dialog_background);
+                        imageView.setPadding(20, 20, 20, 20);
 
 
                         if(MapActivity.this.index == 0) {
