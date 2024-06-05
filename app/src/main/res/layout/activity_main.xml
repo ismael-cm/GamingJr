@@ -52,7 +52,7 @@
                     android:id="@+id/editTextUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ana.bonilla@gmail.com"
+                    android:text="invitado@gamingjr.com"
                     android:hint="Correo Electrónico" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -106,7 +106,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_margin="16dp"
-        android:background="@color/warning_background"
+        android:background="@color/warning"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 

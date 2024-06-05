@@ -2,7 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="background">#003285</color>
-    <color name="warning_background">#FFBF00</color>
+    <color name="background">#CAF4FF</color>
+    <color name="danger">#9A031E</color>
+    <color name="warning">#FFBF00</color>
+    <color name="success">#219C90</color>
+    <color name="primary">#006989</color>
+    <color name="onPrimary">#EEF7FF</color>
+    <color name="primaryDark">#373A40</color>
+    <color name="secondaryDark">#5C2FC2</color>
+    <color name="secondary">#5C2FC2</color>
+    <color name="colorOnPrimary">#254336</color>
+    <color name="onSecondary">#3AA6B9</color>
     <color name="naranjaclaro">#E8957B</color>
+
 </resources>

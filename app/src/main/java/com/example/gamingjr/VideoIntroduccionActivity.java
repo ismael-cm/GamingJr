@@ -35,8 +35,6 @@ public class VideoIntroduccionActivity extends AppCompatActivity {
         primerNivelUsuario = (NivelUsuario) intent.getSerializableExtra("nivel_usuario");
         String nombreVideo = juego.getThumbnail() + "introduccion";
 
-        Toast.makeText(this, primerNivelUsuario.getEstado() + " Juego " + juego.getNombre(), Toast.LENGTH_SHORT).show();
-
         VideoView videoView = findViewById(R.id.videoView);
         Button buttonSkip = findViewById(R.id.buttonSkip);
 
@@ -69,7 +67,6 @@ public class VideoIntroduccionActivity extends AppCompatActivity {
                     .document(nivelUsuario.getId())
                     .set(update, SetOptions.merge())
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Nivel actualizado a activo", Toast.LENGTH_SHORT).show();
                         finish();
                     })
                     .addOnFailureListener(e -> {
