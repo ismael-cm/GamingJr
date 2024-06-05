@@ -74,7 +74,7 @@ public class Nivel2Activity extends AppCompatActivity {
             return insets;
         });
 
-btnNiveles= findViewById(R.id.btnNiveles);
+        btnNiveles= findViewById(R.id.btnNiveles);
         btnNiveles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,7 +169,15 @@ btnNiveles= findViewById(R.id.btnNiveles);
     }
 
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Detiene la reproducción de la música de fondo cuando se destruye la actividad
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.release();
+        }
+    }
 
     private class DragListener implements View.OnDragListener {
         @Override
